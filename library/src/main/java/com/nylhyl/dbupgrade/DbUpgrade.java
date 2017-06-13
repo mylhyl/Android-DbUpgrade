@@ -13,6 +13,7 @@ public final class DbUpgrade {
     private List<Upgrade> mUpgradeList;
     private SQLiteDatabase mSQLiteDatabase;
     private int mOldVersion;
+    private UpgradeConfig mUpgradeConfig;
 
     public DbUpgrade(SQLiteDatabase db, int oldVersion) {
         this.mSQLiteDatabase = db;
@@ -20,11 +21,24 @@ public final class DbUpgrade {
         mUpgradeList = new ArrayList<>();
     }
 
-    public UpgradeConfig setTableName(String tableName) {
-        return new UpgradeConfig(this, mSQLiteDatabase, mUpgradeList, tableName);
+    /**
+     * 设置需要升级的表名
+     *
+     * @param tableName
+     * @param upgradeVersion
+     * @return
+     */
+    public UpgradeConfig setTableName(String tableName, int upgradeVersion) {
+        mUpgradeConfig = new UpgradeConfig(this, mSQLiteDatabase, mUpgradeList, tableName,
+                upgradeVersion);
+        return mUpgradeConfig;
     }
 
     public void upgrade() {
-        UpgradeMigration.migrate(mSQLiteDatabase, mOldVersion, mUpgradeList);
+        if (mOldVersion == mUpgradeConfig.getUpgradeVersion()) {
+            UpgradeMigration.migrate(mSQLiteDatabase, mOldVersion, mUpgradeList);
+            mUpgradeList.clear();
+            mOldVersion++;
+        }
     }
 }

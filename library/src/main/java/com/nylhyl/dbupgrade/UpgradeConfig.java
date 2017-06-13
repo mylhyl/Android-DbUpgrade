@@ -16,16 +16,18 @@ public final class UpgradeConfig {
     private Upgrade mUpgrade;
     private SQLiteDatabase mSQLiteDatabase;
     private List<Upgrade> mUpgradeList;
+    private int mUpgradeVersion;
 
     private UpgradeConfig() {
     }
 
     UpgradeConfig(DbUpgrade dbUpgrade, SQLiteDatabase db,
-                  List<Upgrade> upgradeList, String tableName) {
+                  List<Upgrade> upgradeList, String tableName, int upgradeVersion) {
         this.mDbUpgrade = dbUpgrade;
         this.mSQLiteDatabase = db;
         this.mUpgradeList = upgradeList;
-        mUpgrade = new Upgrade(tableName);
+        this.mUpgrade = new Upgrade(tableName);
+        this.mUpgradeVersion = upgradeVersion;
     }
 
     public UpgradeConfig addColumn(String fieldName, ColumnType fieldType) {
@@ -77,5 +79,9 @@ public final class UpgradeConfig {
 
     private void addUpgrade(Upgrade upgrade) {
         mUpgradeList.add(upgrade);
+    }
+
+    int getUpgradeVersion() {
+        return mUpgradeVersion;
     }
 }
