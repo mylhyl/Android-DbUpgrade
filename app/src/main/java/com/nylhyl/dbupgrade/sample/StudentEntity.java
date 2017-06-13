@@ -28,4 +28,30 @@ public class StudentEntity {
     public void setName(String name) {
         this.name = name;
     }
+//
+////--------------------------------------版本 2 升级字段
+//
+//    @Column(name = "sex")
+//    private String sex;
+//
+//    public String getSex() {
+//        return sex;
+//    }
+//
+//    public void setSex(String sex) {
+//        this.sex = sex;
+//    }
+//
+////--------------------------------------版本 3 升级字段
+//
+//    @Column(name = "age")
+//    private int age;
+//
+//    public int getAge() {
+//        return age;
+//    }
+//
+//    public void setAge(int age) {
+//        this.age = age;
+//    }
 }

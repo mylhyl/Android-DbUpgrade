@@ -162,8 +162,8 @@ final class UpgradeMigration {
     static boolean columnIsExist(SQLiteDatabase db, String tableName, String fieldName) {
         boolean result = false;
 
-        Cursor cursor = db.rawQuery("SELECT sql FROM sqlite_master WHERE tbl_name=" + tableName +
-                " AND type='table'", null);
+        Cursor cursor = db.rawQuery("SELECT sql FROM sqlite_master WHERE tbl_name='" + tableName +
+                "' AND type='table'", null);
         if (cursor != null) {
             if (cursor.moveToNext()) {
                 String createSql = cursor.getString(0);
@@ -171,8 +171,8 @@ final class UpgradeMigration {
                     result = true;
                 }
             }
+            cursor.close();
         }
-        cursor.close();
         return result;
     }
 
