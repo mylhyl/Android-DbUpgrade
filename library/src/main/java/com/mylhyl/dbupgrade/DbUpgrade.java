@@ -2,6 +2,10 @@ package com.mylhyl.dbupgrade;
 
 import android.database.sqlite.SQLiteDatabase;
 
+import com.mylhyl.dbupgrade.xuitls.UpgradeXutils;
+
+import org.xutils.DbManager;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,35 +14,65 @@ import java.util.List;
  */
 
 public final class DbUpgrade {
-    private List<Upgrade> mUpgradeList;
-    private SQLiteDatabase mSQLiteDatabase;
+    private Native mNative;
+
+    private List<UpgradeXutils> mUpgradeXutilsList;
+    private DbManager mDbManager;
+
     private int mOldVersion;
-    private UpgradeConfig mUpgradeConfig;
 
-    public DbUpgrade(SQLiteDatabase db, int oldVersion) {
-        this.mSQLiteDatabase = db;
+    public DbUpgrade(int oldVersion) {
         this.mOldVersion = oldVersion;
-        mUpgradeList = new ArrayList<>();
+
     }
 
-    /**
-     * 设置需要升级的表名
-     *
-     * @param tableName
-     * @param upgradeVersion
-     * @return
-     */
-    public UpgradeConfig setTableName(String tableName, int upgradeVersion) {
-        mUpgradeConfig = new UpgradeConfig(this, mSQLiteDatabase, mUpgradeList, tableName,
-                upgradeVersion);
-        return mUpgradeConfig;
+    public Native with(SQLiteDatabase db) {
+        mNative = new Native(db);
+        return mNative;
     }
 
-    public void upgrade() {
-        if (mOldVersion == mUpgradeConfig.getUpgradeVersion()) {
-            UpgradeMigration.migrate(mSQLiteDatabase, mOldVersion, mUpgradeList);
+    public DbUpgrade withXutils(DbManager db) {
+        this.mDbManager = db;
+        mUpgradeXutilsList = new ArrayList<>();
+        return this;
+    }
+
+    public final class Native {
+        private SQLiteDatabase mSQLiteDatabase;
+        private List<Upgrade> mUpgradeList = new ArrayList<>();
+        private UpgradeController mUpgradeController;
+
+        public Native(SQLiteDatabase mSQLiteDatabase) {
+            this.mSQLiteDatabase = mSQLiteDatabase;
+        }
+
+        /**
+         * 设置需要升级的表名
+         *
+         * @param tableName
+         * @param upgradeVersion 当前 tableName 从 upgradeVersion 版本升级
+         * @return
+         */
+        public UpgradeController setTableName(String tableName, int upgradeVersion) {
+            mUpgradeController = new UpgradeController(this);
+            mUpgradeController.setTableName(tableName, upgradeVersion);
+            return mUpgradeController;
+        }
+
+        SQLiteDatabase getSQLiteDatabase() {
+            return mSQLiteDatabase;
+        }
+
+        List<Upgrade> getUpgradeList() {
+            return mUpgradeList;
+        }
+
+        public void upgrade() {
+            if (mOldVersion == mUpgradeController.getUpgradeVersion()) {
+                UpgradeMigration.migrate(mSQLiteDatabase, mOldVersion, mUpgradeList);
+                mOldVersion++;
+            }
             mUpgradeList.clear();
-            mOldVersion++;
         }
     }
 }

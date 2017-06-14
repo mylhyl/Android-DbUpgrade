@@ -11,42 +11,43 @@ import java.util.List;
  * Created by hupei on 2017/6/9.
  */
 
-public final class UpgradeConfig {
-    private DbUpgrade mDbUpgrade;
+public final class UpgradeController {
+    private DbUpgrade.Native mNative;
     private Upgrade mUpgrade;
     private SQLiteDatabase mSQLiteDatabase;
-    private List<Upgrade> mUpgradeList;
     private int mUpgradeVersion;
 
-    private UpgradeConfig() {
+    private UpgradeController() {
     }
 
-    UpgradeConfig(DbUpgrade dbUpgrade, SQLiteDatabase db,
-                  List<Upgrade> upgradeList, String tableName, int upgradeVersion) {
-        this.mDbUpgrade = dbUpgrade;
-        this.mSQLiteDatabase = db;
-        this.mUpgradeList = upgradeList;
+    UpgradeController(DbUpgrade.Native aNative) {
+        this.mNative = aNative;
+        this.mSQLiteDatabase = mNative.getSQLiteDatabase();
+    }
+
+    UpgradeController setTableName(String tableName, int upgradeVersion) {
         this.mUpgrade = new Upgrade(tableName);
         this.mUpgradeVersion = upgradeVersion;
+        return this;
     }
 
-    public UpgradeConfig addColumn(String fieldName, ColumnType fieldType) {
+    public UpgradeController addColumn(String fieldName, ColumnType fieldType) {
         mUpgrade.addColumn(fieldName, fieldType);
         return this;
     }
 
-    public UpgradeConfig setSqlCreateTable(String sqlCreateTable) {
+    public UpgradeController setSqlCreateTable(String sqlCreateTable) {
         mUpgrade.sqlCreateTable = sqlCreateTable;
         return this;
     }
 
-    public DbUpgrade build() {
+    public DbUpgrade.Native build() {
         if (isUpgrade()) {
             setSqlCreateTable();
             findColumnAll();
             addUpgrade(mUpgrade);
         }
-        return mDbUpgrade;
+        return mNative;
     }
 
     private void setSqlCreateTable() {
@@ -78,7 +79,7 @@ public final class UpgradeConfig {
     }
 
     private void addUpgrade(Upgrade upgrade) {
-        mUpgradeList.add(upgrade);
+        mNative.getUpgradeList().add(upgrade);
     }
 
     int getUpgradeVersion() {

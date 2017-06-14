@@ -17,12 +17,7 @@ import java.util.Map;
  * 数据库升级工具类
  * Created by hupei on 2017/6/9.
  */
-final class UpgradeMigration {
-
-    public static boolean DEBUG = BuildConfig.DEBUG;
-    private static String TAG = "UpgradeMigration";
-    private static final String SQLITE_MASTER = "sqlite_master";
-    private static final String SQLITE_TEMP_MASTER = "sqlite_temp_master";
+final class UpgradeMigration extends BaseUpgradeMigration {
 
     public static void migrate(SQLiteDatabase db, int oldVersion, List<Upgrade> upgradeList) {
         SQLiteDatabase database = db;
@@ -59,66 +54,9 @@ final class UpgradeMigration {
                 printLog("【旧表不存在】" + tableName);
                 return;
             }
-            try {
-                tempTableName = tableName.concat("_TEMP");
-                //安全起见，不管存不存在先删除临时表
-                StringBuilder dropTableStringBuilder = new StringBuilder();
-                dropTableStringBuilder.append("DROP TABLE IF EXISTS ").append(tempTableName)
-                        .append(";");
-                db.execSQL(dropTableStringBuilder.toString());
-
-                //创建临时表
-                StringBuilder insertTableStringBuilder = new StringBuilder();
-                insertTableStringBuilder.append("CREATE TEMPORARY TABLE ").append(tempTableName);
-                insertTableStringBuilder.append(" AS SELECT * FROM ").append(tableName).append(";");
-                db.execSQL(insertTableStringBuilder.toString());
-
-                printLog("【表】" + tableName + "\n ---列-->" + getColumnsStr(upgrade));
-                printLog("【临时表名】" + tempTableName);
-
-            } catch (SQLException e) {
-                Log.e(TAG, "【创建临时表失败】" + tempTableName, e);
-            }
+            generateTempTables(db, tempTableName, tableName, upgrade.columns);
         }
     }
-
-    private static boolean tableIsExist(SQLiteDatabase db, boolean isTemp, String tableName) {
-        if (db == null || TextUtils.isEmpty(tableName)) {
-            return false;
-        }
-        String dbName = isTemp ? SQLITE_TEMP_MASTER : SQLITE_MASTER;
-        String sql = "SELECT COUNT(*) FROM " + dbName + " WHERE type = ? AND name = ?";
-        Cursor cursor = null;
-        int count = 0;
-        try {
-            cursor = db.rawQuery(sql, new String[]{"table", tableName});
-            if (cursor == null || !cursor.moveToFirst()) {
-                return false;
-            }
-            count = cursor.getInt(0);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (cursor != null)
-                cursor.close();
-        }
-        return count > 0;
-    }
-
-
-    private static String getColumnsStr(Upgrade upgrade) {
-        List<String> columns = upgrade.columns;
-        StringBuilder builder = new StringBuilder();
-        for (String column : columns) {
-            builder.append(column);
-            builder.append(",");
-        }
-        if (builder.length() > 0) {
-            builder.deleteCharAt(builder.length() - 1);
-        }
-        return builder.toString();
-    }
-
 
     private static void dropAllTables(SQLiteDatabase db, List<Upgrade> upgradeList) {
         int size = upgradeList.size();
@@ -196,68 +134,11 @@ final class UpgradeMigration {
             String tableName = upgrade.tableName;
             String tempTableName = tableName.concat("_TEMP");
             if (!tableIsExist(db, true, tempTableName)) {
+                printLog("【临时表不存在】" + tempTableName);
                 continue;
             }
-
-            try {
-                // 取出临时表所有列
-                List<String> tempColumns = getColumns(db, tempTableName);
-
-                ArrayList<String> properties = new ArrayList<>(tempColumns.size());
-                //取出新表所有列
-                List<String> newColumns = getColumns(db, tableName);
-                for (String columnName : newColumns) {
-                    //只装入临时表存在的列，新加入的列不需要还原数据
-                    // 也保证insert into 与select 列数一样
-                    if (tempColumns.contains(columnName)) {
-                        properties.add(columnName);
-                    }
-                }
-
-                if (properties.size() > 0) {
-                    final String columnSQL = TextUtils.join(",", properties);
-                    //还原数据
-                    StringBuilder insertTableStringBuilder = new StringBuilder();
-                    insertTableStringBuilder.append("INSERT INTO ").append(tableName).append(" (");
-                    insertTableStringBuilder.append(columnSQL);
-                    insertTableStringBuilder.append(") SELECT ");
-                    insertTableStringBuilder.append(columnSQL);
-                    insertTableStringBuilder.append(" FROM ").append(tempTableName).append(";");
-                    db.execSQL(insertTableStringBuilder.toString());
-                    printLog("【还原数据至】" + tableName);
-                }
-                StringBuilder dropTableStringBuilder = new StringBuilder();
-                dropTableStringBuilder.append("DROP TABLE ").append(tempTableName);
-                db.execSQL(dropTableStringBuilder.toString());
-                printLog("【删除临时表】" + tempTableName);
-            } catch (SQLException e) {
-                Log.e(TAG, "【临时表还原数据失败 】" + tempTableName, e);
-            }
+            restoreData(db, tableName, tempTableName);
         }
     }
 
-    static List<String> getColumns(SQLiteDatabase db, String tableName) {
-        List<String> columns = null;
-        Cursor cursor = null;
-        try {
-            cursor = db.rawQuery("SELECT * FROM " + tableName + " limit 0", null);
-            if (null != cursor && cursor.getColumnCount() > 0) {
-                columns = Arrays.asList(cursor.getColumnNames());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (cursor != null)
-                cursor.close();
-            if (null == columns)
-                columns = new ArrayList<>();
-        }
-        return columns;
-    }
-
-    private static void printLog(String info) {
-        if (DEBUG) {
-            Log.d(TAG, info);
-        }
-    }
 }

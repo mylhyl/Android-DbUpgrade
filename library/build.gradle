@@ -22,5 +22,5 @@ android {
 }
 
 dependencies {
-
+    provided 'org.xutils:xutils:3.+'
 }

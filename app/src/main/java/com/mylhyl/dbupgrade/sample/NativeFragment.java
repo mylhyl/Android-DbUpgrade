@@ -187,9 +187,10 @@ public class NativeFragment extends Fragment {
             public void onUpgrade(DbManager db, int oldVersion, int newVersion) {
                 if (newVersion <= oldVersion) return;
 
-                DbUpgrade dbUpgrade = new DbUpgrade(db.getDatabase(), oldVersion);
+                DbUpgrade dbUpgrade = new DbUpgrade(oldVersion);
+                DbUpgrade.Native with = dbUpgrade.with(db.getDatabase());
                 if (update1to2) {
-                    dbUpgrade.setTableName("School", 1)
+                    with.setTableName("School", 1)
                             .addColumn("studentId", ColumnType.INTEGER).build()
 
                             .setTableName("Student", 1)
@@ -198,7 +199,7 @@ public class NativeFragment extends Fragment {
                             .upgrade();
                 }
                 if (update2to3) {
-                    dbUpgrade.setTableName("School", 2)
+                    with.setTableName("School", 2)
                             .addColumn("address", ColumnType.TEXT)
                             .addColumn("grade", ColumnType.TEXT)
 //                        .setSqlCreateTable(SchoolEntity.sqlCreate3.toString())
