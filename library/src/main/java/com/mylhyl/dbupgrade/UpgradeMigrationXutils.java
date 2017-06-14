@@ -80,8 +80,7 @@ final class UpgradeMigrationXutils extends BaseUpgradeMigration {
                 printLog("【旧表不存在】" + tableName);
                 return;
             }
-            Iterator<String> iterator = table.getColumnMap().keySet().iterator();
-            generateTempTables(db.getDatabase(), tempTableName, tableName, copyIterator(iterator));
+            generateTempTables(db.getDatabase(), tempTableName, tableName);
         }
     }
 
@@ -105,6 +104,9 @@ final class UpgradeMigrationXutils extends BaseUpgradeMigration {
             } else if (linkedHashMap != null) {
                 createTable(db, tableEntity, linkedHashMap.get(entityType));
             }
+            Iterator<String> iterator = tableEntity.getColumnMap().keySet().iterator();
+            String columnsStr = getColumnsStr(copyIterator(iterator));
+            printLog("【表】" + tableEntity.getName() + "\n ---列-->" + columnsStr);
         }
     }
 

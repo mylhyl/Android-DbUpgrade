@@ -21,8 +21,7 @@ class BaseUpgradeMigration {
     static final String SQLITE_MASTER = "sqlite_master";
     static final String SQLITE_TEMP_MASTER = "sqlite_temp_master";
 
-    static void generateTempTables(SQLiteDatabase db, String tempTableName, String
-            tableName, List<String> columns) {
+    static void generateTempTables(SQLiteDatabase db, String tempTableName, String tableName) {
         try {
             tempTableName = tableName.concat("_TEMP");
             //安全起见，不管存不存在先删除临时表
@@ -37,7 +36,6 @@ class BaseUpgradeMigration {
             insertTableStringBuilder.append(" AS SELECT * FROM ").append(tableName).append(";");
             db.execSQL(insertTableStringBuilder.toString());
 
-            printLog("【表】" + tableName + "\n ---列-->" + getColumnsStr(columns));
             printLog("【临时表名】" + tempTableName);
 
         } catch (SQLException e) {

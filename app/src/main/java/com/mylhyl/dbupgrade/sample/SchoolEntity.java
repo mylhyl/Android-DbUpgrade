@@ -11,8 +11,7 @@ public class SchoolEntity {
 
    public static StringBuffer sqlCreate3 = new StringBuffer()
             .append("CREATE TABLE IF NOT EXISTS \"School\" (\"id\" INTEGER, ")
-            .append("\"name\" TEXT,\"studentId\" INTEGER,\"address\" TEXT, ")
-            .append("\"grade\" TEXT, PRIMARY KEY(\"id\", \"name\"))");
+            .append("\"name\" TEXT,\"studentId\" INTEGER, PRIMARY KEY(\"id\", \"name\"))");
 
     @Column(name = "id", isId = true)
     private int id;

@@ -1,13 +1,8 @@
 package com.mylhyl.dbupgrade;
 
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.text.TextUtils;
-import android.util.Log;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -54,7 +49,7 @@ final class UpgradeMigration extends BaseUpgradeMigration {
                 printLog("【旧表不存在】" + tableName);
                 return;
             }
-            generateTempTables(db, tempTableName, tableName, upgrade.columns);
+            generateTempTables(db, tempTableName, tableName);
         }
     }
 
@@ -70,22 +65,24 @@ final class UpgradeMigration extends BaseUpgradeMigration {
         int size = upgradeList.size();
         for (int i = 0; i < size; i++) {
             Upgrade upgrade = upgradeList.get(i);
-            createTable(db, upgrade);
+            String tableName = upgrade.tableName;
+            createTable(db, tableName, upgrade.sqlCreateTable);
             //加入新列
-            LinkedHashMap<String, ColumnType> newFieldMap = upgrade.addColumns;
-            if (newFieldMap.isEmpty()) continue;
-            Iterator<Map.Entry<String, ColumnType>> iterator = newFieldMap.entrySet().iterator();
+            LinkedHashMap<String, ColumnType> addColumnMap = upgrade.addColumns;
+            if (addColumnMap.isEmpty()) continue;
+            Iterator<Map.Entry<String, ColumnType>> iterator = addColumnMap.entrySet().iterator();
             while (iterator.hasNext()) {
                 Map.Entry<String, ColumnType> entry = iterator.next();
                 addColumn(db, upgrade.tableName, entry.getKey(), entry.getValue().toString());
             }
+            List<String> columns = getColumns(db, tableName);
+            printLog("【表】" + tableName + "\n ---列-->" + getColumnsStr(columns));
         }
     }
 
-    private static void createTable(SQLiteDatabase db, Upgrade upgrade) {
+    private static void createTable(SQLiteDatabase db, String tableName, String sql) {
         //判断表是否存在
-        if (!tableIsExist(db, false, upgrade.tableName)) {
-            String sql = upgrade.sqlCreateTable;
+        if (!tableIsExist(db, false, tableName)) {
             db.execSQL(sql);
             printLog("【创建新表成功】\n" + sql);
         }
@@ -93,7 +90,7 @@ final class UpgradeMigration extends BaseUpgradeMigration {
 
     private static void addColumn(SQLiteDatabase db, String tableName, String columnName, String
             columnType) {
-        if (tableIsExist(db, false, tableName) && !columnIsExist(db, tableName, columnName)) {
+        if (!columnIsExist(db, tableName, columnName)) {
             db.execSQL("ALTER TABLE " + tableName + " ADD " + columnName + " " + columnType);
         }
     }
