@@ -5,5 +5,5 @@ package com.mylhyl.dbupgrade;
  */
 
 public enum ColumnType {
-    INTEGER, TEXT, BLOB
+    INTEGER, TEXT, BLOB, REAL
 }

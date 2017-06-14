@@ -71,6 +71,7 @@ final class UpgradeMigration extends BaseUpgradeMigration {
         for (int i = 0; i < size; i++) {
             Upgrade upgrade = upgradeList.get(i);
             createTable(db, upgrade);
+            //加入新列
             LinkedHashMap<String, ColumnType> newFieldMap = upgrade.addColumns;
             if (newFieldMap.isEmpty()) continue;
             Iterator<Map.Entry<String, ColumnType>> iterator = newFieldMap.entrySet().iterator();
