@@ -1,31 +1,30 @@
-package com.mylhyl.dbupgrade.xuitls;
-
-import com.mylhyl.dbupgrade.DbUpgrade;
+package com.mylhyl.dbupgrade;
 
 
 import org.xutils.DbManager;
-
-import java.util.List;
 
 /**
  * Created by hupei on 2017/6/9.
  */
 
 public final class UpgradeControllerXutils {
-    private DbUpgrade mDbUpgrade;
-    private UpgradeXutils mUpgrade;
+    private DbUpgrade.Xutils mXutils;
+    private UpgradeTableXutils mUpgrade;
     private DbManager mDbManager;
-    private List<UpgradeXutils> mUpgradeList;
     private int mUpgradeVersion;
 
     private UpgradeControllerXutils() {
     }
 
-    UpgradeControllerXutils(DbUpgrade dbUpgrade, DbManager db, int upgradeVersion) {
-        this.mDbUpgrade = dbUpgrade;
+    UpgradeControllerXutils(DbUpgrade.Xutils xutils, DbManager db) {
+        this.mXutils = xutils;
         this.mDbManager = db;
-        this.mUpgrade = new UpgradeXutils();
+    }
+
+    UpgradeControllerXutils setEntityType(Class<?> entityType, int upgradeVersion) {
+        this.mUpgrade = new UpgradeTableXutils(entityType);
         this.mUpgradeVersion = upgradeVersion;
+        return this;
     }
 
     public UpgradeControllerXutils setSqlCreateTable(String sqlCreateTable) {
@@ -33,14 +32,14 @@ public final class UpgradeControllerXutils {
         return this;
     }
 
-    public DbUpgrade build() {
+    public DbUpgrade.Xutils build() {
         addUpgrade(mUpgrade);
-        return mDbUpgrade;
+        return mXutils;
     }
 
 
-    private void addUpgrade(UpgradeXutils upgrade) {
-        mUpgradeList.add(upgrade);
+    private void addUpgrade(UpgradeTableXutils upgrade) {
+        mXutils.getUpgradeList().add(upgrade);
     }
 
     int getUpgradeVersion() {

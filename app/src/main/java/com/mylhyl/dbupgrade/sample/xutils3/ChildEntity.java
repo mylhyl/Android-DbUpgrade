@@ -30,27 +30,4 @@ public class ChildEntity {
         this.name = name;
     }
 
-    //-----------------------------------升级用
-
-//    @Column(name = "text")
-//    private String text;
-//
-//    @Column(name = "isAdmin")
-//    private boolean isAdmin;
-//
-//    public String getText() {
-//        return text;
-//    }
-//
-//    public void setText(String text) {
-//        this.text = text;
-//    }
-//
-//    public boolean isAdmin() {
-//        return isAdmin;
-//    }
-//
-//    public void setAdmin(boolean admin) {
-//        isAdmin = admin;
-//    }
 }

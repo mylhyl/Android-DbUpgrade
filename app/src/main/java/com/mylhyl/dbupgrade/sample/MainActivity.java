@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity implements TypesFragment
                 fragment = NativeFragment.newInstance();
                 break;
             case 1:
-//                fragment = GridViewFragment.newInstance();
+                fragment = XutilsFragment.newInstance();
                 break;
             case 2:
 //                fragment = RecyclerViewFragment.newInstance();

@@ -1,5 +1,7 @@
 package com.mylhyl.dbupgrade;
 
+import android.text.TextUtils;
+
 import org.xutils.DbManager;
 import org.xutils.db.sqlite.SqlInfo;
 import org.xutils.db.sqlite.SqlInfoBuilder;
@@ -7,7 +9,7 @@ import org.xutils.db.table.TableEntity;
 import org.xutils.ex.DbException;
 
 import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * xutils3数据库升级工具
@@ -19,47 +21,27 @@ import java.util.LinkedHashMap;
  */
 final class UpgradeMigrationXutils extends BaseUpgradeMigration {
 
-    /**
-     * 单主键升级
-     *
-     * @param db
-     * @param oldVersion
-     * @param entityTypes 需要升级的实体类
-     */
-    public static void migrate(DbManager db, int oldVersion, Class... entityTypes) {
-        migrate(db, oldVersion, null, entityTypes);
-    }
-
-    /**
-     * 多主键升级
-     *
-     * @param db
-     * @param oldVersion
-     * @param linkedHashMap 升级的实体类与创建多主键的sql语句
-     * @param entityTypes   需要升级的实体类
-     */
-    public static void migrate(DbManager db, int oldVersion, LinkedHashMap<Class, String>
-            linkedHashMap, Class... entityTypes) {
+    public static void migrate(DbManager db, int oldVersion, List<UpgradeTableXutils> upgradeList) {
         DbManager database = db;
         try {
             printLog("【旧数据库版本】>>>" + oldVersion);
 
             //step:1
             printLog("【创建临时表】>>>开始");
-            generateTempTables(database, entityTypes);
+            generateTempTables(database, upgradeList);
             printLog("【创建临时表】>>>完成");
 
             //step:2
-            dropAllTables(database, entityTypes);
+            dropAllTables(database, upgradeList);
             printLog("【删除旧表完成】");
 
             //step:3
-            createAllTables(database, linkedHashMap, entityTypes);
+            createAllTables(database, upgradeList);
             printLog("【创建新表完成】");
 
             //step:4
             printLog("【还原数据】开始");
-            restoreData(database, entityTypes);
+            restoreData(database, upgradeList);
             printLog("【还原数据】完成");
 
 
@@ -68,12 +50,11 @@ final class UpgradeMigrationXutils extends BaseUpgradeMigration {
         }
     }
 
-    private static <T> void generateTempTables(DbManager db, Class<T>... entityTypes) throws
-            DbException {
-        int length = entityTypes.length;
-        for (int i = 0; i < length; i++) {
+    private static void generateTempTables(DbManager db, List<UpgradeTableXutils> upgradeList)
+            throws DbException {
+        for (UpgradeTableXutils upgrade : upgradeList) {
             String tempTableName = null;
-            TableEntity<T> table = db.getTable(entityTypes[i]);
+            TableEntity table = db.getTable(upgrade.entityType);
             String tableName = table.getName();
             //判断表是否存在
             if (!tableIsExist(db.getDatabase(), false, tableName)) {
@@ -84,25 +65,21 @@ final class UpgradeMigrationXutils extends BaseUpgradeMigration {
         }
     }
 
-    private static <T> void dropAllTables(DbManager db, Class<T>... entityTypes) throws
+    private static void dropAllTables(DbManager db, List<UpgradeTableXutils> upgradeList) throws
             DbException {
-        int length = entityTypes.length;
-        for (int i = 0; i < length; i++) {
-            db.dropTable(entityTypes[i]);
+        for (UpgradeTableXutils upgrade : upgradeList) {
+            db.dropTable(upgrade.entityType);
         }
     }
 
-    private static <T> void createAllTables(DbManager db, LinkedHashMap<Class, String>
-            linkedHashMap, Class<T>... entityTypes)
+    private static void createAllTables(DbManager db, List<UpgradeTableXutils> upgradeList)
             throws DbException {
-        int length = entityTypes.length;
-        for (int i = 0; i < length; i++) {
-            Class<T> entityType = entityTypes[i];
-            TableEntity<T> tableEntity = db.getTable(entityType);
+        for (UpgradeTableXutils upgrade : upgradeList) {
+            TableEntity tableEntity = db.getTable(upgrade.entityType);
             if (tableEntity.getId() != null) {
                 createTable(db, tableEntity);
-            } else if (linkedHashMap != null) {
-                createTable(db, tableEntity, linkedHashMap.get(entityType));
+            } else if (!TextUtils.isEmpty(upgrade.sqlCreateTable)) {
+                createTable(db, tableEntity, upgrade.sqlCreateTable);
             }
             Iterator<String> iterator = tableEntity.getColumnMap().keySet().iterator();
             String columnsStr = getColumnsStr(copyIterator(iterator));
@@ -110,7 +87,7 @@ final class UpgradeMigrationXutils extends BaseUpgradeMigration {
         }
     }
 
-    private static <T> void createTable(DbManager db, TableEntity<T> tableEntity) throws
+    private static void createTable(DbManager db, TableEntity tableEntity) throws
             DbException {
         if (!tableEntity.tableIsExist()) {
             synchronized (tableEntity.getClass()) {
@@ -121,7 +98,7 @@ final class UpgradeMigrationXutils extends BaseUpgradeMigration {
         }
     }
 
-    private static <T> void createTable(DbManager db, TableEntity<T> tableEntity, String sql) throws
+    private static void createTable(DbManager db, TableEntity tableEntity, String sql) throws
             DbException {
         if (!tableEntity.tableIsExist()) {//判断表是否存在
             synchronized (tableEntity.getClass()) {
@@ -133,10 +110,10 @@ final class UpgradeMigrationXutils extends BaseUpgradeMigration {
         }
     }
 
-    private static <T> void restoreData(DbManager db, Class<T>... entityTypes) throws DbException {
-        int length = entityTypes.length;
-        for (int i = 0; i < length; i++) {
-            TableEntity<T> table = db.getTable(entityTypes[i]);
+    private static void restoreData(DbManager db, List<UpgradeTableXutils> upgradeList)
+            throws DbException {
+        for (UpgradeTableXutils upgrade : upgradeList) {
+            TableEntity table = db.getTable(upgrade.entityType);
             String tableName = table.getName();
             String tempTableName = tableName.concat("_TEMP");
             if (!tableIsExist(db.getDatabase(), true, tempTableName)) {

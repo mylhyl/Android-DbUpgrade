@@ -7,13 +7,13 @@ import java.util.LinkedList;
  * Created by hupei on 2017/6/9.
  */
 
-final class Upgrade {
+final class UpgradeTable {
     public String tableName;
     public String sqlCreateTable;
     public LinkedHashMap<String, ColumnType> addColumns = new LinkedHashMap<>();
     public LinkedList<String> removeColumns = new LinkedList<>();
 
-    public Upgrade(String tableName) {
+    public UpgradeTable(String tableName) {
         this.tableName = tableName;
     }
 

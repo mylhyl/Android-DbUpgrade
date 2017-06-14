@@ -2,8 +2,6 @@ package com.mylhyl.dbupgrade;
 
 import android.database.sqlite.SQLiteDatabase;
 
-import com.mylhyl.dbupgrade.xuitls.UpgradeXutils;
-
 import org.xutils.DbManager;
 
 import java.util.ArrayList;
@@ -15,10 +13,7 @@ import java.util.List;
 
 public final class DbUpgrade {
     private Native mNative;
-
-    private List<UpgradeXutils> mUpgradeXutilsList;
-    private DbManager mDbManager;
-
+    private Xutils mXutils;
     private int mOldVersion;
 
     public DbUpgrade(int oldVersion) {
@@ -31,18 +26,20 @@ public final class DbUpgrade {
         return mNative;
     }
 
-    public DbUpgrade withXutils(DbManager db) {
-        this.mDbManager = db;
-        mUpgradeXutilsList = new ArrayList<>();
-        return this;
+    public Xutils withXutils(DbManager db) {
+        mXutils = new Xutils(db);
+        return mXutils;
     }
 
     public final class Native {
         private SQLiteDatabase mSQLiteDatabase;
-        private List<Upgrade> mUpgradeList = new ArrayList<>();
+        private List<UpgradeTable> mUpgradeList = new ArrayList<>();
         private UpgradeController mUpgradeController;
 
-        public Native(SQLiteDatabase mSQLiteDatabase) {
+        private Native() {
+        }
+
+        Native(SQLiteDatabase mSQLiteDatabase) {
             this.mSQLiteDatabase = mSQLiteDatabase;
         }
 
@@ -63,7 +60,7 @@ public final class DbUpgrade {
             return mSQLiteDatabase;
         }
 
-        List<Upgrade> getUpgradeList() {
+        List<UpgradeTable> getUpgradeList() {
             return mUpgradeList;
         }
 
@@ -73,6 +70,37 @@ public final class DbUpgrade {
                 mOldVersion++;
             }
             mUpgradeList.clear();
+        }
+    }
+
+    public final class Xutils {
+        private DbManager mDbManager;
+        private List<UpgradeTableXutils> mUpgradeList = new ArrayList<>();
+        private UpgradeControllerXutils mUpgradeController;
+
+        private Xutils() {
+        }
+
+        Xutils(DbManager db) {
+            this.mDbManager = db;
+        }
+
+        public UpgradeControllerXutils setEntityType(Class<?> entityType, int upgradeVersion) {
+            mUpgradeController = new UpgradeControllerXutils(this, mDbManager);
+            mUpgradeController.setEntityType(entityType, upgradeVersion);
+            return mUpgradeController;
+        }
+
+        public void upgrade() {
+            if (mOldVersion == mUpgradeController.getUpgradeVersion()) {
+                UpgradeMigrationXutils.migrate(mDbManager, mOldVersion, mUpgradeList);
+                mOldVersion++;
+            }
+            mUpgradeList.clear();
+        }
+
+        List<UpgradeTableXutils> getUpgradeList() {
+            return mUpgradeList;
         }
     }
 }

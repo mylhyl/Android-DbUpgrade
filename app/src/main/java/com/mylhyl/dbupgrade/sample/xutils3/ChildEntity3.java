@@ -6,16 +6,19 @@ import org.xutils.db.annotation.Table;
 /**
  * Created by hupei on 2017/6/13.
  */
-@Table(name = "parent")
-public class ParentEntity {
+@Table(name = "child")
+public class ChildEntity3 {
     @Column(name = "id", isId = true)
     private int id;
 
     @Column(name = "name")
     private String name;
 
-    @Column(name = "email")
-    private String email;
+    @Column(name = "text")
+    private String text;
+
+    @Column(name = "isAdmin")
+    private boolean isAdmin;
 
     public int getId() {
         return id;
@@ -33,11 +36,19 @@ public class ParentEntity {
         this.name = name;
     }
 
-    public String getEmail() {
-        return email;
+    public String getText() {
+        return text;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
     }
 }

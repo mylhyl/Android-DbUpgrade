@@ -7,15 +7,12 @@ import org.xutils.db.annotation.Table;
  * Created by hupei on 2017/6/13.
  */
 @Table(name = "parent")
-public class ParentEntity {
+public class ParentEntity2 {
     @Column(name = "id", isId = true)
     private int id;
 
     @Column(name = "name")
     private String name;
-
-    @Column(name = "email")
-    private String email;
 
     public int getId() {
         return id;
@@ -33,11 +30,4 @@ public class ParentEntity {
         this.name = name;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
 }

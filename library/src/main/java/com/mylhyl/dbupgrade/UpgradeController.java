@@ -3,8 +3,6 @@ package com.mylhyl.dbupgrade;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
 /**
@@ -13,7 +11,7 @@ import java.util.LinkedList;
 
 public final class UpgradeController {
     private DbUpgrade.Native mNative;
-    private Upgrade mUpgrade;
+    private UpgradeTable mUpgrade;
     private SQLiteDatabase mDb;
     private int mUpgradeVersion;
 
@@ -26,7 +24,7 @@ public final class UpgradeController {
     }
 
     UpgradeController setTableName(String tableName, int upgradeVersion) {
-        this.mUpgrade = new Upgrade(tableName);
+        this.mUpgrade = new UpgradeTable(tableName);
         this.mUpgradeVersion = upgradeVersion;
         return this;
     }
@@ -51,10 +49,8 @@ public final class UpgradeController {
     }
 
     public DbUpgrade.Native build() {
-        if (isUpgrade()) {
-            setSqlCreateTable();
-            addUpgrade(mUpgrade);
-        }
+        setSqlCreateTable();
+        addUpgrade(mUpgrade);
         return mNative;
     }
 
@@ -83,24 +79,7 @@ public final class UpgradeController {
         }
     }
 
-    private boolean isUpgrade() {
-        boolean result = false;
-        LinkedHashMap<String, ColumnType> newFieldMap = mUpgrade.addColumns;
-        Iterator<String> iterator = newFieldMap.keySet().iterator();
-        while (iterator.hasNext()) {
-            String column = iterator.next();
-            boolean isExist = UpgradeMigration.columnIsExist(mDb, mUpgrade.tableName,
-                    column);
-            //只要有一个列不存在，则需要更新
-            if (!isExist) {
-                result = true;
-                break;
-            }
-        }
-        return result;
-    }
-
-    private void addUpgrade(Upgrade upgrade) {
+    private void addUpgrade(UpgradeTable upgrade) {
         mNative.getUpgradeList().add(upgrade);
     }
 

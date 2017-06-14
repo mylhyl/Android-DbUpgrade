@@ -14,7 +14,7 @@ import java.util.Map;
  */
 final class UpgradeMigration extends BaseUpgradeMigration {
 
-    public static void migrate(SQLiteDatabase db, int oldVersion, List<Upgrade> upgradeList) {
+    public static void migrate(SQLiteDatabase db, int oldVersion, List<UpgradeTable> upgradeList) {
         SQLiteDatabase database = db;
 
         printLog("【旧数据库版本】>>>" + oldVersion);
@@ -38,11 +38,11 @@ final class UpgradeMigration extends BaseUpgradeMigration {
         printLog("【还原数据】完成");
     }
 
-    private static void generateTempTables(SQLiteDatabase db, List<Upgrade> upgradeList) {
+    private static void generateTempTables(SQLiteDatabase db, List<UpgradeTable> upgradeList) {
         int size = upgradeList.size();
         for (int i = 0; i < size; i++) {
             String tempTableName = null;
-            Upgrade upgrade = upgradeList.get(i);
+            UpgradeTable upgrade = upgradeList.get(i);
             String tableName = upgrade.tableName;
             //判断表是否存在
             if (!tableIsExist(db, false, tableName)) {
@@ -53,18 +53,18 @@ final class UpgradeMigration extends BaseUpgradeMigration {
         }
     }
 
-    private static void dropAllTables(SQLiteDatabase db, List<Upgrade> upgradeList) {
+    private static void dropAllTables(SQLiteDatabase db, List<UpgradeTable> upgradeList) {
         int size = upgradeList.size();
         for (int i = 0; i < size; i++) {
-            Upgrade upgrade = upgradeList.get(i);
+            UpgradeTable upgrade = upgradeList.get(i);
             db.execSQL("DROP TABLE IF EXISTS \"" + upgrade.tableName + "\"");
         }
     }
 
-    private static void createAllTables(SQLiteDatabase db, List<Upgrade> upgradeList) {
+    private static void createAllTables(SQLiteDatabase db, List<UpgradeTable> upgradeList) {
         int size = upgradeList.size();
         for (int i = 0; i < size; i++) {
-            Upgrade upgrade = upgradeList.get(i);
+            UpgradeTable upgrade = upgradeList.get(i);
             String tableName = upgrade.tableName;
             createTable(db, tableName, upgrade.sqlCreateTable);
             //加入新列
@@ -125,10 +125,10 @@ final class UpgradeMigration extends BaseUpgradeMigration {
         return createSql;
     }
 
-    private static void restoreData(SQLiteDatabase db, List<Upgrade> upgradeList) {
+    private static void restoreData(SQLiteDatabase db, List<UpgradeTable> upgradeList) {
         int size = upgradeList.size();
         for (int i = 0; i < size; i++) {
-            Upgrade upgrade = upgradeList.get(i);
+            UpgradeTable upgrade = upgradeList.get(i);
             String tableName = upgrade.tableName;
             String tempTableName = tableName.concat("_TEMP");
             if (!tableIsExist(db, true, tempTableName)) {
