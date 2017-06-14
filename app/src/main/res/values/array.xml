@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="types">
+        <item>原生</item>
+        <item>xUtils3</item>
+    </string-array>
+</resources>
