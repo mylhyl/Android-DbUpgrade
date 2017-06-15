@@ -24,19 +24,48 @@ public final class DbUpgrade {
 
     }
 
+    /**
+     * 原生
+     *
+     * @param db
+     * @return
+     */
     public Native with(SQLiteDatabase db) {
         mNative = new Native(db);
         return mNative;
     }
 
+    /**
+     * xutils3 框架
+     *
+     * @param db
+     * @return
+     */
     public Xutils withXutils(DbManager db) {
         mXutils = new Xutils(db);
         return mXutils;
     }
 
+    /**
+     * greenDao 框架
+     *
+     * @param db
+     * @return
+     */
     public GreenDao withGreenDao(Database db) {
         mGreenDao = new GreenDao(db);
         return mGreenDao;
+    }
+
+    /**
+     * greenDao 框架
+     *
+     * @param db
+     * @return
+     */
+    public Native withGreenDao(SQLiteDatabase db) {
+        mNative = new Native(db);
+        return mNative;
     }
 
     public final class Native {
@@ -64,20 +93,20 @@ public final class DbUpgrade {
             return mUpgradeController;
         }
 
-        SQLiteDatabase getSQLiteDatabase() {
-            return mSQLiteDatabase;
-        }
-
-        List<UpgradeTable> getUpgradeList() {
-            return mUpgradeList;
-        }
-
         public void upgrade() {
             if (mOldVersion == mUpgradeController.getUpgradeVersion()) {
                 new UpgradeMigration().migrate(mSQLiteDatabase, mOldVersion, mUpgradeList);
                 mOldVersion++;
             }
             mUpgradeList.clear();
+        }
+
+        SQLiteDatabase getSQLiteDatabase() {
+            return mSQLiteDatabase;
+        }
+
+        List<UpgradeTable> getUpgradeList() {
+            return mUpgradeList;
         }
     }
 
@@ -93,6 +122,13 @@ public final class DbUpgrade {
             this.mDbManager = db;
         }
 
+        /**
+         * 设置需要升级的实体类
+         *
+         * @param entityType
+         * @param upgradeVersion entityType 实体类 从 upgradeVersion 版本升级
+         * @return
+         */
         public UpgradeControllerXutils setEntityType(Class<?> entityType, int upgradeVersion) {
             mUpgradeController = new UpgradeControllerXutils(this);
             mUpgradeController.setEntityType(entityType, upgradeVersion);
@@ -125,10 +161,17 @@ public final class DbUpgrade {
             this.mDatabase = db;
         }
 
-        public GreenDao(SQLiteDatabase sqLiteDatabase) {
+        GreenDao(SQLiteDatabase sqLiteDatabase) {
             this.mSqLiteDatabase = sqLiteDatabase;
         }
 
+        /**
+         * 设置需要升级的 AbstractDao 类
+         *
+         * @param abstractDao
+         * @param upgradeVersion abstractDao 从 upgradeVersion 版本升级
+         * @return
+         */
         public UpgradeControllerGreenDao setAbstractDao(Class<? extends AbstractDao<?, ?>>
                                                                 abstractDao, int upgradeVersion) {
             mUpgradeController = new UpgradeControllerGreenDao(this);

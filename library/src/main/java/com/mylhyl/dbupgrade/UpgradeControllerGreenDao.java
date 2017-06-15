@@ -2,7 +2,6 @@ package com.mylhyl.dbupgrade;
 
 
 import org.greenrobot.greendao.AbstractDao;
-import org.greenrobot.greendao.database.Database;
 
 /**
  * Created by hupei on 2017/6/9.
@@ -27,6 +26,12 @@ public final class UpgradeControllerGreenDao {
         return this;
     }
 
+    /**
+     * 设置创建表的 sql 语句，如多主键
+     *
+     * @param sqlCreateTable
+     * @return
+     */
     public UpgradeControllerGreenDao setSqlCreateTable(String sqlCreateTable) {
         mUpgrade.sqlCreateTable = sqlCreateTable;
         return this;

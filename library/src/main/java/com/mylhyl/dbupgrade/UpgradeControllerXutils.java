@@ -1,8 +1,6 @@
 package com.mylhyl.dbupgrade;
 
 
-import org.xutils.DbManager;
-
 /**
  * Created by hupei on 2017/6/9.
  */
@@ -25,6 +23,12 @@ public final class UpgradeControllerXutils {
         return this;
     }
 
+    /**
+     * 设置创建表的 sql 语句，如多主键
+     *
+     * @param sqlCreateTable
+     * @return
+     */
     public UpgradeControllerXutils setSqlCreateTable(String sqlCreateTable) {
         mUpgrade.sqlCreateTable = sqlCreateTable;
         return this;

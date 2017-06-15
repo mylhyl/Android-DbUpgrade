@@ -3,7 +3,6 @@ package com.mylhyl.dbupgrade;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -30,6 +29,13 @@ public final class UpgradeController {
         return this;
     }
 
+    /**
+     * 添加列
+     *
+     * @param columnName 列名
+     * @param fieldType  列类型
+     * @return
+     */
     public UpgradeController addColumn(String columnName, ColumnType fieldType) {
         //列不存在才添加
         if (!UpgradeMigration.columnIsExist(mDb, mUpgrade.tableName, columnName))
@@ -37,6 +43,12 @@ public final class UpgradeController {
         return this;
     }
 
+    /**
+     * 删除列
+     *
+     * @param columnName 列名
+     * @return
+     */
     public UpgradeController removeColumn(String columnName) {
         //列存在才添加
         if (UpgradeMigration.columnIsExist(mDb, mUpgrade.tableName, columnName))
@@ -44,6 +56,12 @@ public final class UpgradeController {
         return this;
     }
 
+    /**
+     * 设置创建表的 sql 语句，如多主键
+     *
+     * @param sqlCreateTable
+     * @return
+     */
     public UpgradeController setSqlCreateTable(String sqlCreateTable) {
         mUpgrade.sqlCreateTable = sqlCreateTable;
         return this;
