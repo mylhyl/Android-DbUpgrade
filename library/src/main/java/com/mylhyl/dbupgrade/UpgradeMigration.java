@@ -3,6 +3,7 @@ package com.mylhyl.dbupgrade;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -135,7 +136,28 @@ final class UpgradeMigration extends BaseUpgradeMigration {
                 printLog("【临时表不存在】" + tempTableName);
                 continue;
             }
-            restoreData(db, tableName, tempTableName);
+            // 取出临时表所有列
+            List<String> tempColumns = getColumns(db, tempTableName);
+
+            ArrayList<String> properties = new ArrayList<>(tempColumns.size());
+            //取出新表所有列
+            List<String> newColumns = new ArrayList<>(getColumns(db, tableName));
+            if (!upgrade.removeColumns.isEmpty()) {
+                newColumns.removeAll(upgrade.removeColumns);
+            }
+            if (!upgrade.addColumns.isEmpty()) {
+                Iterator<String> iterator = upgrade.addColumns.keySet().iterator();
+                while (iterator.hasNext()) {
+                    newColumns.add(iterator.next());
+                }
+            }
+
+            for (String columnName : newColumns) {
+                if (tempColumns.contains(columnName)) {
+                    properties.add(columnName);
+                }
+            }
+            restoreData(db, tableName, tempTableName, properties);
         }
     }
 

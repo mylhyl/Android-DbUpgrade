@@ -12,14 +12,14 @@ public class ParentEntity3 {
     private int id;
 
     @Column(name = "name")
-    private String name;
+    private String name = "nameA";
 
     @Column(name = "sex")
-    private String sex;
+    private String sex = "sexA";
 
 
     @Column(name = "age")
-    private int age;
+    private int age = 18;
 
     public int getId() {
         return id;

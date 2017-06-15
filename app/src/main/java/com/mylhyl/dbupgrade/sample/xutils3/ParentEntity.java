@@ -12,10 +12,10 @@ public class ParentEntity {
     private int id;
 
     @Column(name = "name")
-    private String name;
+    private String name = "nameA";
 
     @Column(name = "email")
-    private String email;
+    private String email = "emailA";
 
     public int getId() {
         return id;

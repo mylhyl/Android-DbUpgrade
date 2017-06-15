@@ -12,7 +12,7 @@ public class ChildEntity {
     private int id;
 
     @Column(name = "name")
-    private String name;
+    private String name = "nameB";
 
     public int getId() {
         return id;

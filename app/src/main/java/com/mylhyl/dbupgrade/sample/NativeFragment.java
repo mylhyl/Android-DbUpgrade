@@ -192,7 +192,8 @@ public class NativeFragment extends Fragment {
                 if (update1to2) {
                     with.setTableName("School", 1)
                             .addColumn("studentId", ColumnType.INTEGER)
-                            .setSqlCreateTable(SchoolEntity.sqlCreate3.toString())
+                            .removeColumn("name")
+//                            .setSqlCreateTable(SchoolEntity.sqlCreate3.toString())
                             .build()
 
                             .setTableName("Student", 1)
@@ -204,7 +205,6 @@ public class NativeFragment extends Fragment {
                     with.setTableName("School", 2)
                             .addColumn("address", ColumnType.TEXT)
                             .addColumn("grade", ColumnType.TEXT)
-                            .removeColumn("studentId")
                             .build()
 
                             .setTableName("Student", 2)

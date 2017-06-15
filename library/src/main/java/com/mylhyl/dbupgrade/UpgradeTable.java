@@ -1,7 +1,9 @@
 package com.mylhyl.dbupgrade;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by hupei on 2017/6/9.
@@ -11,7 +13,7 @@ final class UpgradeTable {
     public String tableName;
     public String sqlCreateTable;
     public LinkedHashMap<String, ColumnType> addColumns = new LinkedHashMap<>();
-    public LinkedList<String> removeColumns = new LinkedList<>();
+    public List<String> removeColumns = new ArrayList<>();
 
     public UpgradeTable(String tableName) {
         this.tableName = tableName;

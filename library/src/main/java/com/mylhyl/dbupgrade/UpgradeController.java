@@ -4,6 +4,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by hupei on 2017/6/9.
@@ -59,7 +60,7 @@ public final class UpgradeController {
         if (TextUtils.isEmpty(mUpgrade.sqlCreateTable)) {
             String tableSql = UpgradeMigration.createTableSql(mDb, mUpgrade.tableName);
             //检查是否有删除字段
-            LinkedList<String> removeColumns = mUpgrade.removeColumns;
+            List<String> removeColumns = mUpgrade.removeColumns;
             if (!removeColumns.isEmpty()) {
                 String[] split = tableSql.split(",");
                 for (String str : split) {
@@ -69,7 +70,11 @@ public final class UpgradeController {
                             if (str.replaceAll(" ", "").contains("))")) {
                                 tableSql = tableSql.replace("," + str, "))");
                             } else {
-                                tableSql = tableSql.replace(str + ",", "");
+                                if (str.contains(")")) {
+                                    tableSql = tableSql.replace("," + str, ")");
+                                } else {
+                                    tableSql = tableSql.replace(str + ",", "");
+                                }
                             }
                         }
                     }

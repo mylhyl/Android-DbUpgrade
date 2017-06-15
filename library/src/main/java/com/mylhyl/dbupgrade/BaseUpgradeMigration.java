@@ -97,22 +97,9 @@ class BaseUpgradeMigration {
         return count > 0;
     }
 
-    static void restoreData(SQLiteDatabase db, String tableName, String tempTableName) {
+    static void restoreData(SQLiteDatabase db, String tableName, String tempTableName,
+                            ArrayList<String> properties) {
         try {
-            // 取出临时表所有列
-            List<String> tempColumns = getColumns(db, tempTableName);
-
-            ArrayList<String> properties = new ArrayList<>(tempColumns.size());
-            //取出新表所有列
-            List<String> newColumns = getColumns(db, tableName);
-            for (String columnName : newColumns) {
-                //只装入临时表存在的列，新加入的列不需要还原数据
-                // 也保证insert into 与select 列数一样
-                if (tempColumns.contains(columnName)) {
-                    properties.add(columnName);
-                }
-            }
-
             if (properties.size() > 0) {
                 final String columnSQL = TextUtils.join(",", properties);
                 //还原数据

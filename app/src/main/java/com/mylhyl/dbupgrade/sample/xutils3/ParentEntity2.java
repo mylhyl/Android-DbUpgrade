@@ -12,7 +12,7 @@ public class ParentEntity2 {
     private int id;
 
     @Column(name = "name")
-    private String name;
+    private String name = "nameA";
 
     public int getId() {
         return id;

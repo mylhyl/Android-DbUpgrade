@@ -12,13 +12,13 @@ public class ChildEntity3 {
     private int id;
 
     @Column(name = "name")
-    private String name;
+    private String name = "nameB";
 
     @Column(name = "text")
-    private String text;
+    private String text = "textB";
 
     @Column(name = "isAdmin")
-    private boolean isAdmin;
+    private boolean isAdmin = true;
 
     public int getId() {
         return id;

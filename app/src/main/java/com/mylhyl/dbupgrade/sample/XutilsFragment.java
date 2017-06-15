@@ -107,10 +107,8 @@ public class XutilsFragment extends Fragment {
         update2to3 = false;
 
         ParentEntity parentEntity = new ParentEntity();
-        parentEntity.setName("parentA");
 
         ChildEntity childEntity = new ChildEntity();
-        childEntity.setName("childA");
 
         DbManager xdb = getXutilsDb();
         try {

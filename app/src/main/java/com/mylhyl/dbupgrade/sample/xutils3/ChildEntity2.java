@@ -12,10 +12,10 @@ public class ChildEntity2 {
     private int id;
 
     @Column(name = "name")
-    private String name;
+    private String name = "nameB";
 
     @Column(name = "text")
-    private String text;
+    private String text = "textB";
 
     public int getId() {
         return id;
