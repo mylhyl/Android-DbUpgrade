@@ -56,20 +56,28 @@ class BaseUpgradeMigration {
     }
 
     static List<String> getColumns(SQLiteDatabase db, String tableName) {
-        List<String> columns = null;
+        List<String> columns = new ArrayList<>();
         Cursor cursor = null;
         try {
-            cursor = db.rawQuery("SELECT * FROM " + tableName + " limit 0", null);
-            if (null != cursor && cursor.getColumnCount() > 0) {
-                columns = Arrays.asList(cursor.getColumnNames());
+            cursor = db.rawQuery("PRAGMA table_info(" + tableName + ")", null);
+            if (cursor != null) {
+                int columnIndex = cursor.getColumnIndex("name");
+                if (columnIndex == -1) {
+                    return columns;
+                }
+                int index = 0;
+                String[] columnNames = new String[cursor.getCount()];
+                for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+                    columnNames[index] = cursor.getString(columnIndex);
+                    index++;
+                }
+                columns.addAll(Arrays.asList(columnNames));
             }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             if (cursor != null)
                 cursor.close();
-            if (null == columns)
-                columns = new ArrayList<>();
         }
         return columns;
     }
@@ -97,9 +105,19 @@ class BaseUpgradeMigration {
         return count > 0;
     }
 
-    static void restoreData(SQLiteDatabase db, String tableName, String tempTableName,
-                            ArrayList<String> properties) {
+    static void restoreData(SQLiteDatabase db, String tableName, String tempTableName) {
         try {
+            // 取出临时表列
+            List<String> tempColumns = getColumns(db, tempTableName);
+            ArrayList<String> properties = new ArrayList<>(tempColumns.size());
+            //取出新表列
+            List<String> newColumns = getColumns(db, tableName);
+            for (String columnName : newColumns) {
+                if (tempColumns.contains(columnName)) {
+                    properties.add(columnName);
+                }
+            }
+
             if (properties.size() > 0) {
                 final String columnSQL = TextUtils.join(",", properties);
                 //还原数据

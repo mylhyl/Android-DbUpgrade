@@ -121,21 +121,7 @@ final class UpgradeMigrationXutils extends BaseUpgradeMigration {
                 printLog("【临时表不存在】" + tempTableName);
                 continue;
             }
-            // 取出临时表所有列
-            List<String> columns = getColumns(db.getDatabase(), tempTableName);
-
-            ArrayList<String> properties = new ArrayList<>(columns.size());
-            //取出新表所有列
-            Iterator<String> iterator = table.getColumnMap().keySet().iterator();
-            while (iterator.hasNext()) {
-                String columnName = iterator.next();
-                //只装入临时表存在的列，新加入的列不需要还原数据
-                // 也保证insert into 与select 列数一样
-                if (columns.contains(columnName)) {
-                    properties.add(columnName);
-                }
-            }
-            restoreData(db.getDatabase(), tableName, tempTableName, properties);
+            restoreData(db.getDatabase(), tableName, tempTableName);
         }
     }
 }
