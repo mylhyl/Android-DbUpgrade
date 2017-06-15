@@ -83,8 +83,8 @@ final class UpgradeMigration extends BaseUpgradeMigration {
                 Map.Entry<String, ColumnType> entry = iterator.next();
                 addColumn(db, upgrade.tableName, entry.getKey(), entry.getValue().toString());
             }
-            List<String> columns = getColumns(tableName);
-            printLog("【表】" + tableName + "\n ---列-->" + getColumnsStr(columns));
+//            List<String> columns = getColumns(tableName);
+//            printLog("【表】" + tableName + "\n ---列-->" + getColumnsStr(columns));
         }
     }
 
@@ -102,7 +102,7 @@ final class UpgradeMigration extends BaseUpgradeMigration {
             db.execSQL("ALTER TABLE " + tableName + " ADD " + columnName + " " + columnType);
     }
 
-    boolean columnIsExist(SQLiteDatabase db, String tableName, String fieldName) {
+    static boolean columnIsExist(SQLiteDatabase db, String tableName, String fieldName) {
         boolean result = false;
         Cursor cursor = db.rawQuery("SELECT sql FROM sqlite_master WHERE tbl_name='" + tableName +
                 "' AND type='table'", null);
@@ -116,7 +116,7 @@ final class UpgradeMigration extends BaseUpgradeMigration {
         return result;
     }
 
-    String createTableSql(SQLiteDatabase db, String tableName) {
+    static String createTableSql(SQLiteDatabase db, String tableName) {
         String createSql = "";
         Cursor cursor = db.rawQuery("SELECT sql FROM sqlite_master WHERE tbl_name=?",
                 new String[]{tableName});

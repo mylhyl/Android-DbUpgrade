@@ -79,14 +79,11 @@ final class UpgradeMigrationXutils extends BaseUpgradeMigration {
             throws DbException {
         for (UpgradeTableXutils upgrade : upgradeList) {
             TableEntity tableEntity = db.getTable(upgrade.entityType);
-            if (tableEntity.getId() != null) {
+            if (TextUtils.isEmpty(upgrade.sqlCreateTable)) {
                 createTable(db, tableEntity);
-            } else if (!TextUtils.isEmpty(upgrade.sqlCreateTable)) {
+            } else {
                 createTable(db, tableEntity, upgrade.sqlCreateTable);
             }
-            Iterator<String> iterator = tableEntity.getColumnMap().keySet().iterator();
-            String columnsStr = getColumnsStr(copyIterator(iterator));
-            printLog("【表】" + tableEntity.getName() + "\n ---列-->" + columnsStr);
         }
     }
 

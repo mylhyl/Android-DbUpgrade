@@ -23,4 +23,5 @@ android {
 
 dependencies {
     provided 'org.xutils:xutils:3.+'
+    provided 'org.greenrobot:greendao:3.+'
 }

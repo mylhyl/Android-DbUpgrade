@@ -2,6 +2,8 @@ package com.mylhyl.dbupgrade;
 
 import android.database.sqlite.SQLiteDatabase;
 
+import org.greenrobot.greendao.AbstractDao;
+import org.greenrobot.greendao.database.Database;
 import org.xutils.DbManager;
 
 import java.util.ArrayList;
@@ -14,6 +16,7 @@ import java.util.List;
 public final class DbUpgrade {
     private Native mNative;
     private Xutils mXutils;
+    private GreenDao mGreenDao;
     private int mOldVersion;
 
     public DbUpgrade(int oldVersion) {
@@ -29,6 +32,11 @@ public final class DbUpgrade {
     public Xutils withXutils(DbManager db) {
         mXutils = new Xutils(db);
         return mXutils;
+    }
+
+    public GreenDao withGreenDao(Database db) {
+        mGreenDao = new GreenDao(db);
+        return mGreenDao;
     }
 
     public final class Native {
@@ -100,6 +108,38 @@ public final class DbUpgrade {
         }
 
         List<UpgradeTableXutils> getUpgradeList() {
+            return mUpgradeList;
+        }
+    }
+
+    public final class GreenDao {
+        private Database mDatabase;
+        private List<UpgradeTableGreenDao> mUpgradeList = new ArrayList<>();
+        private UpgradeControllerGreenDao mUpgradeController;
+
+        private GreenDao() {
+        }
+
+        GreenDao(Database db) {
+            this.mDatabase = db;
+        }
+
+        public UpgradeControllerGreenDao setAbstractDao(Class<? extends AbstractDao<?, ?>>
+                                                                entityType, int upgradeVersion) {
+            mUpgradeController = new UpgradeControllerGreenDao(this, mDatabase);
+            mUpgradeController.setAbstractDao(entityType, upgradeVersion);
+            return mUpgradeController;
+        }
+
+        public void upgrade() {
+            if (mOldVersion == mUpgradeController.getUpgradeVersion()) {
+                new UpgradeMigrationGreenDao().migrate(mDatabase, mOldVersion, mUpgradeList);
+                mOldVersion++;
+            }
+            mUpgradeList.clear();
+        }
+
+        List<UpgradeTableGreenDao> getUpgradeList() {
             return mUpgradeList;
         }
     }
