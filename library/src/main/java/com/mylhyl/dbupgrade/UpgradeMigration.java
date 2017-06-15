@@ -39,7 +39,7 @@ final class UpgradeMigration extends BaseUpgradeMigration {
             restoreData(upgradeList);
             printLog("【还原数据】完成");
 
-            endTransaction();
+            setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

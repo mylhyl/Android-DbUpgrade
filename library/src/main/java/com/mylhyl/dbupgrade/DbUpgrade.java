@@ -41,7 +41,7 @@ public final class DbUpgrade {
      * @return
      */
     public Xutils withXutils(DbManager db) {
-        mXutils = new Xutils(mOldVersion, db);
+        mXutils = new Xutils(db);
         return mXutils;
     }
 
@@ -88,24 +88,32 @@ public final class DbUpgrade {
          */
         public UpgradeController setTableName(String tableName, int upgradeVersion) {
             mUpgradeController = new UpgradeController(this);
-            mUpgradeController.setTableName(tableName, upgradeVersion);
+            mUpgradeController.newTableName(tableName, upgradeVersion);
             return mUpgradeController;
         }
 
-        public void upgrade() {
-            if (mOldVersion == mUpgradeController.getUpgradeVersion()) {
-                new UpgradeMigration().migrate(mSQLiteDatabase, mOldVersion, mUpgradeList);
-                mOldVersion++;
-            }
+        int getOldVersion() {
+            return mOldVersion;
+        }
+
+        void addOldVersion() {
+            mOldVersion++;
+        }
+
+        void addUpgrade(UpgradeTable upgrade) {
+            mUpgradeList.add(upgrade);
+        }
+
+        void clearUpgradeList() {
             mUpgradeList.clear();
+        }
+
+        public void upgrade() {
+            new UpgradeMigration().migrate(mSQLiteDatabase, mOldVersion, mUpgradeList);
         }
 
         SQLiteDatabase getSQLiteDatabase() {
             return mSQLiteDatabase;
-        }
-
-        List<UpgradeTable> getUpgradeList() {
-            return mUpgradeList;
         }
     }
 
@@ -113,13 +121,11 @@ public final class DbUpgrade {
         private DbManager mDbManager;
         private List<UpgradeTableXutils> mUpgradeList = new ArrayList<>();
         private UpgradeControllerXutils mUpgradeController;
-        private int mOldVersion;
 
         private Xutils() {
         }
 
-        Xutils(int oldVersion, DbManager db) {
-            this.mOldVersion = oldVersion;
+        Xutils(DbManager db) {
             this.mDbManager = db;
         }
 
@@ -184,24 +190,32 @@ public final class DbUpgrade {
         public UpgradeControllerGreenDao setAbstractDao(Class<? extends AbstractDao<?, ?>>
                                                                 abstractDao, int upgradeVersion) {
             mUpgradeController = new UpgradeControllerGreenDao(this);
-            mUpgradeController.setAbstractDao(abstractDao, upgradeVersion);
+            mUpgradeController.newAbstractDao(abstractDao, upgradeVersion);
             return mUpgradeController;
         }
 
-        public void upgrade() {
-            if (mOldVersion == mUpgradeController.getUpgradeVersion()) {
-                if (mDatabase != null)
-                    new UpgradeMigrationGreenDao().migrate(mDatabase, mOldVersion, mUpgradeList);
-                else
-                    new UpgradeMigrationGreenDao().migrate(mSqLiteDatabase, mOldVersion,
-                            mUpgradeList);
-                mOldVersion++;
-            }
+        int getOldVersion() {
+            return mOldVersion;
+        }
+
+        void addOldVersion() {
+            mOldVersion++;
+        }
+
+        void addUpgrade(UpgradeTableGreenDao upgrade) {
+            mUpgradeList.add(upgrade);
+        }
+
+        void clearUpgradeList() {
             mUpgradeList.clear();
         }
 
-        List<UpgradeTableGreenDao> getUpgradeList() {
-            return mUpgradeList;
+        void upgrade() {
+            if (mDatabase != null)
+                new UpgradeMigrationGreenDao().migrate(mDatabase, mOldVersion, mUpgradeList);
+            else
+                new UpgradeMigrationGreenDao().migrate(mSqLiteDatabase, mOldVersion,
+                        mUpgradeList);
         }
     }
 }
