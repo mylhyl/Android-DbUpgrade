@@ -8,7 +8,6 @@ import org.xutils.db.sqlite.SqlInfoBuilder;
 import org.xutils.db.table.TableEntity;
 import org.xutils.ex.DbException;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -22,8 +21,10 @@ import java.util.List;
  */
 final class UpgradeMigrationXutils extends BaseUpgradeMigration {
 
-    public static void migrate(DbManager db, int oldVersion, List<UpgradeTableXutils> upgradeList) {
+    public void migrate(DbManager db, int oldVersion, List<UpgradeTableXutils> upgradeList) {
         DbManager database = db;
+        setDatabase(database.getDatabase());
+        beginTransaction();
         try {
             printLog("【旧数据库版本】>>>" + oldVersion);
 
@@ -45,35 +46,36 @@ final class UpgradeMigrationXutils extends BaseUpgradeMigration {
             restoreData(database, upgradeList);
             printLog("【还原数据】完成");
 
-
+            setTransactionSuccessful();
         } catch (DbException e) {
             e.printStackTrace();
+        } finally {
+            endTransaction();
         }
     }
 
-    private static void generateTempTables(DbManager db, List<UpgradeTableXutils> upgradeList)
+    private void generateTempTables(DbManager db, List<UpgradeTableXutils> upgradeList)
             throws DbException {
         for (UpgradeTableXutils upgrade : upgradeList) {
-            String tempTableName = null;
             TableEntity table = db.getTable(upgrade.entityType);
             String tableName = table.getName();
             //判断表是否存在
-            if (!tableIsExist(db.getDatabase(), false, tableName)) {
+            if (!tableIsExist(false, tableName)) {
                 printLog("【旧表不存在】" + tableName);
                 return;
             }
-            generateTempTables(db.getDatabase(), tempTableName, tableName);
+            generateTempTables(tableName);
         }
     }
 
-    private static void dropAllTables(DbManager db, List<UpgradeTableXutils> upgradeList) throws
+    private void dropAllTables(DbManager db, List<UpgradeTableXutils> upgradeList) throws
             DbException {
         for (UpgradeTableXutils upgrade : upgradeList) {
             db.dropTable(upgrade.entityType);
         }
     }
 
-    private static void createAllTables(DbManager db, List<UpgradeTableXutils> upgradeList)
+    private void createAllTables(DbManager db, List<UpgradeTableXutils> upgradeList)
             throws DbException {
         for (UpgradeTableXutils upgrade : upgradeList) {
             TableEntity tableEntity = db.getTable(upgrade.entityType);
@@ -88,7 +90,7 @@ final class UpgradeMigrationXutils extends BaseUpgradeMigration {
         }
     }
 
-    private static void createTable(DbManager db, TableEntity tableEntity) throws
+    private void createTable(DbManager db, TableEntity tableEntity) throws
             DbException {
         if (!tableEntity.tableIsExist()) {
             synchronized (tableEntity.getClass()) {
@@ -99,7 +101,7 @@ final class UpgradeMigrationXutils extends BaseUpgradeMigration {
         }
     }
 
-    private static void createTable(DbManager db, TableEntity tableEntity, String sql) throws
+    private void createTable(DbManager db, TableEntity tableEntity, String sql) throws
             DbException {
         if (!tableEntity.tableIsExist()) {//判断表是否存在
             synchronized (tableEntity.getClass()) {
@@ -111,17 +113,17 @@ final class UpgradeMigrationXutils extends BaseUpgradeMigration {
         }
     }
 
-    private static void restoreData(DbManager db, List<UpgradeTableXutils> upgradeList)
+    private void restoreData(DbManager db, List<UpgradeTableXutils> upgradeList)
             throws DbException {
         for (UpgradeTableXutils upgrade : upgradeList) {
             TableEntity table = db.getTable(upgrade.entityType);
             String tableName = table.getName();
             String tempTableName = tableName.concat("_TEMP");
-            if (!tableIsExist(db.getDatabase(), true, tempTableName)) {
+            if (!tableIsExist(true, tempTableName)) {
                 printLog("【临时表不存在】" + tempTableName);
                 continue;
             }
-            restoreData(db.getDatabase(), tableName, tempTableName);
+            restoreData(tableName, tempTableName);
         }
     }
 }

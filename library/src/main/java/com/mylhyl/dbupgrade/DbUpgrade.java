@@ -66,7 +66,7 @@ public final class DbUpgrade {
 
         public void upgrade() {
             if (mOldVersion == mUpgradeController.getUpgradeVersion()) {
-                UpgradeMigration.migrate(mSQLiteDatabase, mOldVersion, mUpgradeList);
+                new UpgradeMigration().migrate(mSQLiteDatabase, mOldVersion, mUpgradeList);
                 mOldVersion++;
             }
             mUpgradeList.clear();
@@ -93,7 +93,7 @@ public final class DbUpgrade {
 
         public void upgrade() {
             if (mOldVersion == mUpgradeController.getUpgradeVersion()) {
-                UpgradeMigrationXutils.migrate(mDbManager, mOldVersion, mUpgradeList);
+                new UpgradeMigrationXutils().migrate(mDbManager, mOldVersion, mUpgradeList);
                 mOldVersion++;
             }
             mUpgradeList.clear();

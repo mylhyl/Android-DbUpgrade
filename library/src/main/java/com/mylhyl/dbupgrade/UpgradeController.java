@@ -57,31 +57,27 @@ public final class UpgradeController {
 
     private void setSqlCreateTable() {
         //判断是否有自定义sql
-        if (TextUtils.isEmpty(mUpgrade.sqlCreateTable)) {
-            String tableSql = UpgradeMigration.createTableSql(mDb, mUpgrade.tableName);
-            //检查是否有删除字段
-            List<String> removeColumns = mUpgrade.removeColumns;
-            if (!removeColumns.isEmpty()) {
-                String[] split = tableSql.split(",");
-                for (String str : split) {
-                    for (String column : removeColumns) {
-                        int indexOf = str.indexOf(column);
-                        if (indexOf > 0) {
-                            if (str.replaceAll(" ", "").contains("))")) {
-                                tableSql = tableSql.replace("," + str, "))");
-                            } else {
-                                if (str.contains(")")) {
-                                    tableSql = tableSql.replace("," + str, ")");
-                                } else {
-                                    tableSql = tableSql.replace(str + ",", "");
-                                }
-                            }
-                        }
-                    }
+        if (!TextUtils.isEmpty(mUpgrade.sqlCreateTable)) return;
+        String tableSql = UpgradeMigration.createTableSql(mDb, mUpgrade.tableName);
+        //检查是否有删除字段
+        List<String> removeColumns = mUpgrade.removeColumns;
+        if (removeColumns.isEmpty()) return;
+        String[] split = tableSql.split(",");
+        for (String str : split) {
+            for (String column : removeColumns) {
+                int indexOf = str.indexOf(column);
+                if (indexOf < 0) continue;
+                if (str.replaceAll(" ", "").contains("))"))
+                    tableSql = tableSql.replace("," + str, "))");
+                else {
+                    if (str.contains(")"))
+                        tableSql = tableSql.replace("," + str, ")");
+                    else
+                        tableSql = tableSql.replace(str + ",", "");
                 }
             }
-            mUpgrade.sqlCreateTable = tableSql;
         }
+        mUpgrade.sqlCreateTable = tableSql;
     }
 
     private void addUpgrade(UpgradeTable upgrade) {
