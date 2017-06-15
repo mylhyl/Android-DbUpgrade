@@ -13,25 +13,28 @@
     
 #### 常用升级逻辑做法
 ```java
-    if (oldVersion == 1){
-        //升级 TableA
-    }
-    if(oldVersion == 2){
-        //升级 TableB
-        //升级 TableC
-    }
+        for (int i = oldVersion; i < newVersion; i++) {
+            switch (i) {
+                case 1:
+                    //升级 TableA
+                    break;
+                case 2:
+                    break;
+                    //升级 TableB
+                    //升级 TableC
+                default:
+                    break;
+            }
+        }
 ```
 然而该库只需要这样
 ```java
     DbUpgrade dbUpgrade = new DbUpgrade(oldVersion);
     DbUpgrade.Xutils with = dbUpgrade.withXutils(db);//切换到Xutil3
     with.setEntityType(TableA.class, 1)
-            .build()
-            .upgrade();
+            .upgrade();//每个版本都必须 upgrade()一次
 
     with.setEntityType(TableB.class, 2)
-            .build()
             .setEntityType(TableC.class, 2)
-            .build()
-            .upgrade();
+            .upgrade();//每个版本都必须 upgrade()一次
 ```

@@ -194,11 +194,9 @@ public class NativeFragment extends Fragment {
                             .addColumn("studentId", ColumnType.INTEGER)
                             .removeColumn("name")
 //                            .setSqlCreateTable(SchoolEntity.sqlCreate3.toString())
-//                            .build()
 
                             .setTableName("Student", 1)
                             .addColumn("sex", ColumnType.TEXT)
-//                            .build()
                             //每个版本都必须 upgrade()一次
                             .upgrade();
                 }
