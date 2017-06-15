@@ -33,8 +33,6 @@ public class XutilsFragment extends Fragment {
     private int dbVersion = 1;
     private String dbName = "dbupgradexutils.db";
     private File dbDir = null;
-    private boolean update1to2;
-    private boolean update2to3;
 
     public XutilsFragment() {
     }
@@ -103,8 +101,6 @@ public class XutilsFragment extends Fragment {
 
     private void onCreateDb() {
         dbVersion = 1;
-        update1to2 = false;
-        update2to3 = false;
 
         ParentEntity parentEntity = new ParentEntity();
 
@@ -147,7 +143,6 @@ public class XutilsFragment extends Fragment {
 
     private void on1Update2() {
         dbVersion = 2;
-        update1to2 = true;
         try {
             getXutilsDb().close();
         } catch (IOException e) {
@@ -158,7 +153,6 @@ public class XutilsFragment extends Fragment {
 
     private void on2Update3() {
         dbVersion = 3;
-        update2to3 = true;
         try {
             getXutilsDb().close();
         } catch (IOException e) {
@@ -169,8 +163,6 @@ public class XutilsFragment extends Fragment {
 
     private void on1Update3() {
         dbVersion = 3;
-        update1to2 = true;
-        update2to3 = true;
         try {
             getXutilsDb().close();
         } catch (IOException e) {
@@ -191,20 +183,20 @@ public class XutilsFragment extends Fragment {
 
                 DbUpgrade dbUpgrade = new DbUpgrade(oldVersion);
                 DbUpgrade.Xutils with = dbUpgrade.withXutils(db);
-                if (update1to2) {
+                if (oldVersion == 1) {
                     with.setEntityType(ParentEntity2.class, 1)
-                            .build()
-
-                            .setEntityType(ChildEntity2.class, 1).build()
+//                            .setSqlCreateTable("")
+                            .setEntityType(ChildEntity2.class, 1)
+//                            .build()
                             //每个版本都必须 upgrade()一次
                             .upgrade();
-                }
-                if (update2to3) {
-                    with.setEntityType(ParentEntity3.class, 2)
-                            .build()
 
+                    if (dbVersion == 3) oldVersion++;
+                }
+                if (oldVersion == 2) {
+                    with.setEntityType(ParentEntity3.class, 2)
                             .setEntityType(ChildEntity3.class, 2)
-                            .build()
+//                            .build()
                             //每个版本都必须 upgrade()一次
                             .upgrade();
                 }

@@ -3,5 +3,6 @@
     <string-array name="types">
         <item>原生</item>
         <item>xUtils3</item>
+        <item>greenDao</item>
     </string-array>
 </resources>

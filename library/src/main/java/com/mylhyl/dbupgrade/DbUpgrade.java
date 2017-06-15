@@ -21,7 +21,6 @@ public final class DbUpgrade {
 
     public DbUpgrade(int oldVersion) {
         this.mOldVersion = oldVersion;
-
     }
 
     /**
@@ -42,7 +41,7 @@ public final class DbUpgrade {
      * @return
      */
     public Xutils withXutils(DbManager db) {
-        mXutils = new Xutils(db);
+        mXutils = new Xutils(mOldVersion, db);
         return mXutils;
     }
 
@@ -114,11 +113,13 @@ public final class DbUpgrade {
         private DbManager mDbManager;
         private List<UpgradeTableXutils> mUpgradeList = new ArrayList<>();
         private UpgradeControllerXutils mUpgradeController;
+        private int mOldVersion;
 
         private Xutils() {
         }
 
-        Xutils(DbManager db) {
+        Xutils(int oldVersion, DbManager db) {
+            this.mOldVersion = oldVersion;
             this.mDbManager = db;
         }
 
@@ -131,20 +132,28 @@ public final class DbUpgrade {
          */
         public UpgradeControllerXutils setEntityType(Class<?> entityType, int upgradeVersion) {
             mUpgradeController = new UpgradeControllerXutils(this);
-            mUpgradeController.setEntityType(entityType, upgradeVersion);
+            mUpgradeController.newUpgradeTable(entityType, upgradeVersion);
             return mUpgradeController;
         }
 
-        public void upgrade() {
-            if (mOldVersion == mUpgradeController.getUpgradeVersion()) {
-                new UpgradeMigrationXutils().migrate(mDbManager, mOldVersion, mUpgradeList);
-                mOldVersion++;
-            }
+        int getOldVersion() {
+            return mOldVersion;
+        }
+
+        void addOldVersion() {
+            mOldVersion++;
+        }
+
+        void addUpgrade(UpgradeTableXutils upgrade) {
+            mUpgradeList.add(upgrade);
+        }
+
+        void clearUpgradeList() {
             mUpgradeList.clear();
         }
 
-        List<UpgradeTableXutils> getUpgradeList() {
-            return mUpgradeList;
+        void upgrade() {
+            new UpgradeMigrationXutils().migrate(mDbManager, mOldVersion, mUpgradeList);
         }
     }
 

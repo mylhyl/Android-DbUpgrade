@@ -17,12 +17,6 @@ public final class UpgradeControllerXutils {
         this.mXutils = xutils;
     }
 
-    UpgradeControllerXutils setEntityType(Class<?> entityType, int upgradeVersion) {
-        this.mUpgrade = new UpgradeTableXutils(entityType);
-        this.mUpgradeVersion = upgradeVersion;
-        return this;
-    }
-
     /**
      * 设置创建表的 sql 语句，如多主键
      *
@@ -34,17 +28,39 @@ public final class UpgradeControllerXutils {
         return this;
     }
 
-    public DbUpgrade.Xutils build() {
-        addUpgrade(mUpgrade);
-        return mXutils;
+    /**
+     * 表配置结束，并配置另一个表
+     *
+     * @param entityType
+     * @param upgradeVersion
+     * @return
+     */
+    public UpgradeControllerXutils setEntityType(Class<?> entityType, int upgradeVersion) {
+        addUpgrade();
+        return mXutils.setEntityType(entityType, upgradeVersion);
     }
 
-
-    private void addUpgrade(UpgradeTableXutils upgrade) {
-        mXutils.getUpgradeList().add(upgrade);
+    /**
+     * 升级
+     *
+     * @return
+     */
+    public void upgrade() {
+        addUpgrade();
+        if (mXutils.getOldVersion() == mUpgradeVersion) {
+            mXutils.upgrade();
+            mXutils.addOldVersion();
+        }
+        mXutils.clearUpgradeList();
     }
 
-    int getUpgradeVersion() {
-        return mUpgradeVersion;
+    UpgradeControllerXutils newUpgradeTable(Class<?> entityType, int upgradeVersion) {
+        this.mUpgrade = new UpgradeTableXutils(entityType);
+        this.mUpgradeVersion = upgradeVersion;
+        return this;
+    }
+
+    void addUpgrade() {
+        mXutils.addUpgrade(mUpgrade);
     }
 }

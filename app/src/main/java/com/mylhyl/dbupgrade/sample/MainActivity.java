@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements TypesFragment
                 fragment = XutilsFragment.newInstance();
                 break;
             case 2:
-//                fragment = RecyclerViewFragment.newInstance();
+                fragment = GreenDaoFragment.newInstance();
                 break;
         }
 

@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'org.greenrobot.greendao'
 
 android {
     compileSdkVersion 25
@@ -18,6 +19,9 @@ android {
         }
     }
 }
+greendao {
+    schemaVersion 1
+}
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
@@ -26,7 +30,8 @@ dependencies {
     })
     compile project(':library')
     compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'org.xutils:xutils:3.5.+'
+    compile 'org.xutils:xutils:+'
+    compile 'org.greenrobot:greendao:+'
     compile 'com.android.support:support-v4:25.3.1'
     testCompile 'junit:junit:4.12'
 }
