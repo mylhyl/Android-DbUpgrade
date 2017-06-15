@@ -148,7 +148,8 @@ final class UpgradeMigration extends BaseUpgradeMigration {
             if (!upgrade.addColumns.isEmpty()) {
                 Iterator<String> iterator = upgrade.addColumns.keySet().iterator();
                 while (iterator.hasNext()) {
-                    newColumns.add(iterator.next());
+                    String addColumn = iterator.next();
+                    if (!newColumns.contains(addColumn)) newColumns.add(addColumn);
                 }
             }
 
