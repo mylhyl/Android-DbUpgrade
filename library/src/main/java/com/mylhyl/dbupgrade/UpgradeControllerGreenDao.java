@@ -11,20 +11,18 @@ import org.greenrobot.greendao.database.Database;
 public final class UpgradeControllerGreenDao {
     private DbUpgrade.GreenDao mGreenDao;
     private UpgradeTableGreenDao mUpgrade;
-    private Database mDatabase;
     private int mUpgradeVersion;
 
     private UpgradeControllerGreenDao() {
     }
 
-    UpgradeControllerGreenDao(DbUpgrade.GreenDao greenDao, Database db) {
+    UpgradeControllerGreenDao(DbUpgrade.GreenDao greenDao) {
         this.mGreenDao = greenDao;
-        this.mDatabase = db;
     }
 
-    UpgradeControllerGreenDao setAbstractDao(Class<? extends AbstractDao<?, ?>> entityType,
+    UpgradeControllerGreenDao setAbstractDao(Class<? extends AbstractDao<?, ?>> abstractDao,
                                              int upgradeVersion) {
-        this.mUpgrade = new UpgradeTableGreenDao(entityType);
+        this.mUpgrade = new UpgradeTableGreenDao(abstractDao);
         this.mUpgradeVersion = upgradeVersion;
         return this;
     }

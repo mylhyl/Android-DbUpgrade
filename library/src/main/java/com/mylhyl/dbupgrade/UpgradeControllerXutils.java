@@ -10,15 +10,13 @@ import org.xutils.DbManager;
 public final class UpgradeControllerXutils {
     private DbUpgrade.Xutils mXutils;
     private UpgradeTableXutils mUpgrade;
-    private DbManager mDbManager;
     private int mUpgradeVersion;
 
     private UpgradeControllerXutils() {
     }
 
-    UpgradeControllerXutils(DbUpgrade.Xutils xutils, DbManager db) {
+    UpgradeControllerXutils(DbUpgrade.Xutils xutils) {
         this.mXutils = xutils;
-        this.mDbManager = db;
     }
 
     UpgradeControllerXutils setEntityType(Class<?> entityType, int upgradeVersion) {

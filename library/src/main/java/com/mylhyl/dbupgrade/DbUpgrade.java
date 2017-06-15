@@ -94,7 +94,7 @@ public final class DbUpgrade {
         }
 
         public UpgradeControllerXutils setEntityType(Class<?> entityType, int upgradeVersion) {
-            mUpgradeController = new UpgradeControllerXutils(this, mDbManager);
+            mUpgradeController = new UpgradeControllerXutils(this);
             mUpgradeController.setEntityType(entityType, upgradeVersion);
             return mUpgradeController;
         }
@@ -114,6 +114,7 @@ public final class DbUpgrade {
 
     public final class GreenDao {
         private Database mDatabase;
+        private SQLiteDatabase mSqLiteDatabase;
         private List<UpgradeTableGreenDao> mUpgradeList = new ArrayList<>();
         private UpgradeControllerGreenDao mUpgradeController;
 
@@ -124,16 +125,24 @@ public final class DbUpgrade {
             this.mDatabase = db;
         }
 
+        public GreenDao(SQLiteDatabase sqLiteDatabase) {
+            this.mSqLiteDatabase = sqLiteDatabase;
+        }
+
         public UpgradeControllerGreenDao setAbstractDao(Class<? extends AbstractDao<?, ?>>
-                                                                entityType, int upgradeVersion) {
-            mUpgradeController = new UpgradeControllerGreenDao(this, mDatabase);
-            mUpgradeController.setAbstractDao(entityType, upgradeVersion);
+                                                                abstractDao, int upgradeVersion) {
+            mUpgradeController = new UpgradeControllerGreenDao(this);
+            mUpgradeController.setAbstractDao(abstractDao, upgradeVersion);
             return mUpgradeController;
         }
 
         public void upgrade() {
             if (mOldVersion == mUpgradeController.getUpgradeVersion()) {
-                new UpgradeMigrationGreenDao().migrate(mDatabase, mOldVersion, mUpgradeList);
+                if (mDatabase != null)
+                    new UpgradeMigrationGreenDao().migrate(mDatabase, mOldVersion, mUpgradeList);
+                else
+                    new UpgradeMigrationGreenDao().migrate(mSqLiteDatabase, mOldVersion,
+                            mUpgradeList);
                 mOldVersion++;
             }
             mUpgradeList.clear();
