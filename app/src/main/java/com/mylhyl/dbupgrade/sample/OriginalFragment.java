@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.mylhyl.dbupgrade.ColumnType;
 import com.mylhyl.dbupgrade.DbUpgrade;
+import com.mylhyl.dbupgrade.original.Original;
 
 import org.xutils.DbManager;
 import org.xutils.ex.DbException;
@@ -23,7 +24,7 @@ import java.io.File;
 import java.io.IOException;
 
 
-public class NativeFragment extends Fragment {
+public class OriginalFragment extends Fragment {
     private MainActivity mainActivity;
     private TextView textView;
     private int dbVersion = 1;
@@ -32,11 +33,11 @@ public class NativeFragment extends Fragment {
     private boolean update1to2;
     private boolean update2to3;
 
-    public NativeFragment() {
+    public OriginalFragment() {
     }
 
-    public static NativeFragment newInstance() {
-        NativeFragment fragment = new NativeFragment();
+    public static OriginalFragment newInstance() {
+        OriginalFragment fragment = new OriginalFragment();
         return fragment;
     }
 
@@ -188,7 +189,7 @@ public class NativeFragment extends Fragment {
                 if (newVersion <= oldVersion) return;
 
                 DbUpgrade dbUpgrade = new DbUpgrade(oldVersion, newVersion);
-                DbUpgrade.Native with = dbUpgrade.with(db.getDatabase());
+                Original with = dbUpgrade.with(db.getDatabase());
                 if (update1to2) {
                     with.setUpgradeVersion(1)
                             .setUpgradeTable("School")

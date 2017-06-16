@@ -1,4 +1,6 @@
-package com.mylhyl.dbupgrade;
+package com.mylhyl.dbupgrade.xuitls3;
+
+import com.mylhyl.dbupgrade.base.BaseTable;
 
 /**
  * Created by hupei on 2017/6/14.

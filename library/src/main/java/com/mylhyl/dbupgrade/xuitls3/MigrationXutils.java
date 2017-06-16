@@ -1,6 +1,8 @@
-package com.mylhyl.dbupgrade;
+package com.mylhyl.dbupgrade.xuitls3;
 
 import android.text.TextUtils;
+
+import com.mylhyl.dbupgrade.base.BaseMigration;
 
 import org.xutils.DbManager;
 import org.xutils.db.sqlite.SqlInfo;

@@ -1,5 +1,7 @@
-package com.mylhyl.dbupgrade;
+package com.mylhyl.dbupgrade.greendao;
 
+
+import com.mylhyl.dbupgrade.base.AbsController;
 
 import org.greenrobot.greendao.AbstractDao;
 
@@ -7,10 +9,10 @@ import org.greenrobot.greendao.AbstractDao;
  * Created by hupei on 2017/6/9.
  */
 
-public final class ControllerGreenDao extends BaseController<TableGreenDao,
-        Class<? extends AbstractDao<?, ?>>, DbUpgrade.GreenDao.With, ControllerGreenDao> {
+public final class ControllerGreenDao extends AbsController<TableGreenDao,
+        Class<? extends AbstractDao<?, ?>>, GreenDao.With, ControllerGreenDao> {
 
-    ControllerGreenDao(DbUpgrade.GreenDao.With with, Class<? extends AbstractDao<?, ?>>
+    ControllerGreenDao(GreenDao.With with, Class<? extends AbstractDao<?, ?>>
             abstractDao) {
         this.mWith = with;
         this.mTable = new TableGreenDao(abstractDao);
@@ -19,7 +21,7 @@ public final class ControllerGreenDao extends BaseController<TableGreenDao,
 
     @Override
     public ControllerGreenDao setUpgradeTable(Class<? extends AbstractDao<?, ?>> abstractDao) {
-        if (mWith.isUpgrade()) addUpgrade();
+        addUpgrade();
         return mWith.setUpgradeTable(abstractDao);
     }
 

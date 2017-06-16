@@ -1,7 +1,10 @@
-package com.mylhyl.dbupgrade;
+package com.mylhyl.dbupgrade.original;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+
+import com.mylhyl.dbupgrade.base.BaseMigration;
+import com.mylhyl.dbupgrade.ColumnType;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -12,7 +15,7 @@ import java.util.Map;
  * 数据库升级工具类
  * Created by hupei on 2017/6/9.
  */
-final class Migration extends BaseMigration {
+public final class Migration extends BaseMigration {
 
     public void migrate(SQLiteDatabase db, int oldVersion, List<Table> upgradeList) {
         SQLiteDatabase database = db;

@@ -1,6 +1,9 @@
-package com.mylhyl.dbupgrade;
+package com.mylhyl.dbupgrade.original;
 
 import android.text.TextUtils;
+
+import com.mylhyl.dbupgrade.base.AbsController;
+import com.mylhyl.dbupgrade.ColumnType;
 
 import java.util.List;
 
@@ -8,10 +11,9 @@ import java.util.List;
  * Created by hupei on 2017/6/9.
  */
 
-public final class Controller extends BaseController<Table, String, DbUpgrade.Native.With,
-        Controller> {
+public final class Controller extends AbsController<Table, String, Original.With, Controller> {
 
-    Controller(DbUpgrade.Native.With with, String tableName) {
+    public Controller(Original.With with, String tableName) {
         this.mWith = with;
         this.mTable = new Table(tableName);
     }
@@ -45,7 +47,7 @@ public final class Controller extends BaseController<Table, String, DbUpgrade.Na
 
     @Override
     public Controller setUpgradeTable(String tableName) {
-        if (mWith.isUpgrade()) addUpgrade();
+        addUpgrade();
         return mWith.setUpgradeTable(tableName);
     }
 
@@ -56,7 +58,7 @@ public final class Controller extends BaseController<Table, String, DbUpgrade.Na
     }
 
     @Override
-    void addUpgrade() {
+    protected void addUpgrade() {
         setSqlCreateTable();
         mWith.addUpgrade(mTable);
     }

@@ -1,14 +1,16 @@
-package com.mylhyl.dbupgrade;
+package com.mylhyl.dbupgrade.xuitls3;
 
+
+import com.mylhyl.dbupgrade.base.AbsController;
 
 /**
  * Created by hupei on 2017/6/9.
  */
 
-public final class ControllerXutils extends BaseController<TableXutils, Class<?>,
-        DbUpgrade.Xutils.With, ControllerXutils> {
+public final class ControllerXutils extends AbsController<TableXutils, Class<?>,
+        Xutils.With, ControllerXutils> {
 
-    ControllerXutils(DbUpgrade.Xutils.With with, Class<?> entityType) {
+    ControllerXutils(Xutils.With with, Class<?> entityType) {
         this.mWith = with;
         this.mTable = new TableXutils(entityType);
     }
@@ -16,7 +18,7 @@ public final class ControllerXutils extends BaseController<TableXutils, Class<?>
 
     @Override
     public ControllerXutils setUpgradeTable(Class<?> entityType) {
-        if (mWith.isUpgrade()) addUpgrade();
+        addUpgrade();
         return mWith.setUpgradeTable(entityType);
     }
 

@@ -31,7 +31,7 @@
 然而该库只需要这样
 ```java
         DbUpgrade dbUpgrade = new DbUpgrade(oldVersion, newVersion);
-        DbUpgrade.GreenDao with = dbUpgrade.withGreenDao(db);//切换greenDao
+        GreenDao with = dbUpgrade.withGreenDao(db);//切换greenDao
             with.setUpgradeVersion(1)
                     .setUpgradeTable(TableA.class)
                     //每个版本都必须 upgrade()一次

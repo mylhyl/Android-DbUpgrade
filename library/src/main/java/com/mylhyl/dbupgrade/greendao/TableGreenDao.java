@@ -1,4 +1,6 @@
-package com.mylhyl.dbupgrade;
+package com.mylhyl.dbupgrade.greendao;
+
+import com.mylhyl.dbupgrade.base.BaseTable;
 
 import org.greenrobot.greendao.AbstractDao;
 

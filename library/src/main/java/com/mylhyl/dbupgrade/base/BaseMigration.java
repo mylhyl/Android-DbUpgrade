@@ -1,10 +1,12 @@
-package com.mylhyl.dbupgrade;
+package com.mylhyl.dbupgrade.base;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
+
+import com.mylhyl.dbupgrade.BuildConfig;
 
 import org.greenrobot.greendao.database.EncryptedDatabase;
 
@@ -17,7 +19,7 @@ import java.util.List;
  * Created by hupei on 2017/6/14.
  */
 
-class BaseMigration {
+public class BaseMigration {
     public static boolean DEBUG = BuildConfig.DEBUG;
     private static final String TAG = "DbUpgrade";
     private static final String SQLITE_MASTER = "sqlite_master";
@@ -26,15 +28,15 @@ class BaseMigration {
     private SQLiteDatabase mDatabase;
     private EncryptedDatabase mEncryptedDatabase;
 
-    void setEncryptedDatabase(EncryptedDatabase encryptedDatabase) {
+    protected void setEncryptedDatabase(EncryptedDatabase encryptedDatabase) {
         this.mEncryptedDatabase = encryptedDatabase;
     }
 
-    void setDatabase(SQLiteDatabase database) {
+    protected void setDatabase(SQLiteDatabase database) {
         this.mDatabase = database;
     }
 
-    void beginTransaction() {
+    protected void beginTransaction() {
         if (mDatabase != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
                     && mDatabase.isWriteAheadLoggingEnabled())
@@ -44,17 +46,17 @@ class BaseMigration {
             mEncryptedDatabase.beginTransaction();
     }
 
-    void setTransactionSuccessful() {
+    protected void setTransactionSuccessful() {
         if (mDatabase != null) mDatabase.setTransactionSuccessful();
         else mEncryptedDatabase.setTransactionSuccessful();
     }
 
-    void endTransaction() {
+    protected void endTransaction() {
         if (mDatabase != null) mDatabase.endTransaction();
         else mEncryptedDatabase.endTransaction();
     }
 
-    void generateTempTables(String tableName) {
+    protected void generateTempTables(String tableName) {
         String tempTableName = tableName.concat("_TEMP");
         //安全起见，不管存不存在先删除临时表
         StringBuilder dropTableStringBuilder = new StringBuilder();
@@ -74,16 +76,6 @@ class BaseMigration {
         printLog("【临时表名】" + tempTableName);
 
     }
-
-//    String getColumnsStr(List<String> columns) {
-//        StringBuilder builder = new StringBuilder();
-//        for (String column : columns) {
-//            builder.append(column);
-//            builder.append(",");
-//        }
-//        if (builder.length() > 0) builder.deleteCharAt(builder.length() - 1);
-//        return builder.toString();
-//    }
 
     List<String> getColumns(String tableName) {
         List<String> columns = new ArrayList<>();
@@ -106,7 +98,7 @@ class BaseMigration {
         return columns;
     }
 
-    boolean tableIsExist(boolean isTemp, String tableName) {
+    protected boolean tableIsExist(boolean isTemp, String tableName) {
         if ((mDatabase == null && mEncryptedDatabase == null) || TextUtils.isEmpty(tableName)) {
             return false;
         }
@@ -129,7 +121,7 @@ class BaseMigration {
         return count > 0;
     }
 
-    void restoreData(String tableName, String tempTableName) {
+    protected void restoreData(String tableName, String tempTableName) {
         // 取出临时表列
         List<String> tempColumns = getColumns(tempTableName);
         ArrayList<String> properties = new ArrayList<>(tempColumns.size());
@@ -188,7 +180,7 @@ class BaseMigration {
         return columnNames;
     }
 
-    void printLog(String info) {
+    protected void printLog(String info) {
         if (DEBUG) Log.d(TAG, info);
     }
 }

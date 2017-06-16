@@ -1,13 +1,13 @@
-package com.mylhyl.dbupgrade;
+package com.mylhyl.dbupgrade.base;
 
 /**
  * Created by hupei on 2017/6/16.
  */
 
-abstract class BaseController<Table extends BaseTable, Name, With extends DbUpgrade.AbsWith,
+public abstract class AbsController<Table extends BaseTable, Name, With extends AbsWith,
         Controller> {
-    With mWith;
-    Table mTable;
+    protected With mWith;
+    protected Table mTable;
 
     /**
      * 表配置结束，并配置另一个表
@@ -40,7 +40,8 @@ abstract class BaseController<Table extends BaseTable, Name, With extends DbUpgr
         mWith.clearUpgradeList();
     }
 
-    void addUpgrade() {
-        mWith.addUpgrade(mTable);
+    protected void addUpgrade() {
+        if (mWith.isUpgrade())
+            mWith.addUpgrade(mTable);
     }
 }

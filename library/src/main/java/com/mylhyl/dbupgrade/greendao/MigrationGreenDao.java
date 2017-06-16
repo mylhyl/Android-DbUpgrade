@@ -1,7 +1,9 @@
-package com.mylhyl.dbupgrade;
+package com.mylhyl.dbupgrade.greendao;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
+
+import com.mylhyl.dbupgrade.base.BaseMigration;
 
 import org.greenrobot.greendao.AbstractDao;
 import org.greenrobot.greendao.database.Database;

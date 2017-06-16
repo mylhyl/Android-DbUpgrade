@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mylhyl.dbupgrade.DbUpgrade;
+import com.mylhyl.dbupgrade.greendao.GreenDao;
 import com.mylhyl.dbupgrade.sample.greendao.DaoMaster;
 import com.mylhyl.dbupgrade.sample.greendao.DaoSession;
 import com.mylhyl.dbupgrade.sample.greendao.DeviceEntity;
@@ -192,7 +193,7 @@ public class GreenDaoFragment extends Fragment {
             if (newVersion <= oldVersion) return;
 
             DbUpgrade dbUpgrade = new DbUpgrade(oldVersion, newVersion);
-            DbUpgrade.GreenDao with = dbUpgrade.withGreenDao(db);
+            GreenDao with = dbUpgrade.withGreenDao(db);
             if (oldVersion == 1) {
                 with.setUpgradeVersion(1)
                         .setUpgradeTable(DeviceEntityDao.class)

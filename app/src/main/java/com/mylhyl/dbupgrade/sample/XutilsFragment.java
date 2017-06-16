@@ -18,6 +18,7 @@ import com.mylhyl.dbupgrade.sample.xutils3.ChildEntity3;
 import com.mylhyl.dbupgrade.sample.xutils3.ParentEntity;
 import com.mylhyl.dbupgrade.sample.xutils3.ParentEntity2;
 import com.mylhyl.dbupgrade.sample.xutils3.ParentEntity3;
+import com.mylhyl.dbupgrade.xuitls3.Xutils;
 
 import org.xutils.DbManager;
 import org.xutils.ex.DbException;
@@ -181,11 +182,11 @@ public class XutilsFragment extends Fragment {
             public void onUpgrade(DbManager db, int oldVersion, int newVersion) {
                 if (newVersion <= oldVersion) return;
                 DbUpgrade dbUpgrade = new DbUpgrade(oldVersion, newVersion);
-                DbUpgrade.Xutils with = dbUpgrade.withXutils(db);
+                Xutils with = dbUpgrade.withXutils(db);
                 if (oldVersion == 1) {
                     with.setUpgradeVersion(1)
                             .setUpgradeTable(ParentEntity2.class)
-//                            .setSqlCreateTable("")
+                            .setSqlCreateTable("")
                             .setUpgradeTable(ChildEntity2.class)
                             //每个版本都必须 upgrade()一次
                             .upgrade();

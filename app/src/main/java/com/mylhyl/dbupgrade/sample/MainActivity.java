@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity implements TypesFragment
         int typeId = (int) ContentUris.parseId(uri);
         switch (typeId) {
             case 0:
-                fragment = NativeFragment.newInstance();
+                fragment = OriginalFragment.newInstance();
                 break;
             case 1:
                 fragment = XutilsFragment.newInstance();

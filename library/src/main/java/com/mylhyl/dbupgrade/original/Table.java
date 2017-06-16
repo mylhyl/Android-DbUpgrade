@@ -1,4 +1,7 @@
-package com.mylhyl.dbupgrade;
+package com.mylhyl.dbupgrade.original;
+
+import com.mylhyl.dbupgrade.base.BaseTable;
+import com.mylhyl.dbupgrade.ColumnType;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -8,7 +11,7 @@ import java.util.List;
  * Created by hupei on 2017/6/9.
  */
 
-final class Table extends BaseTable {
+public final class Table extends BaseTable {
     public String tableName;
     public String sqlCreateTable;
     public LinkedHashMap<String, ColumnType> addColumns = new LinkedHashMap<>();
