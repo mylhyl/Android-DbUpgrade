@@ -8,7 +8,6 @@ import org.xutils.db.sqlite.SqlInfoBuilder;
 import org.xutils.db.table.TableEntity;
 import org.xutils.ex.DbException;
 
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -19,9 +18,9 @@ import java.util.List;
  * 4、还原数据
  * Created by hupei on 2017/6/14.
  */
-final class UpgradeMigrationXutils extends BaseUpgradeMigration {
+final class MigrationXutils extends BaseMigration {
 
-    public void migrate(DbManager db, int oldVersion, List<UpgradeTableXutils> upgradeList) {
+    public void migrate(DbManager db, int oldVersion, List<TableXutils> upgradeList) {
         DbManager database = db;
         setDatabase(database.getDatabase());
         beginTransaction();
@@ -54,9 +53,9 @@ final class UpgradeMigrationXutils extends BaseUpgradeMigration {
         }
     }
 
-    private void generateTempTables(DbManager db, List<UpgradeTableXutils> upgradeList)
+    private void generateTempTables(DbManager db, List<TableXutils> upgradeList)
             throws DbException {
-        for (UpgradeTableXutils upgrade : upgradeList) {
+        for (TableXutils upgrade : upgradeList) {
             TableEntity table = db.getTable(upgrade.entityType);
             String tableName = table.getName();
             //判断表是否存在
@@ -68,16 +67,16 @@ final class UpgradeMigrationXutils extends BaseUpgradeMigration {
         }
     }
 
-    private void dropAllTables(DbManager db, List<UpgradeTableXutils> upgradeList) throws
+    private void dropAllTables(DbManager db, List<TableXutils> upgradeList) throws
             DbException {
-        for (UpgradeTableXutils upgrade : upgradeList) {
+        for (TableXutils upgrade : upgradeList) {
             db.dropTable(upgrade.entityType);
         }
     }
 
-    private void createAllTables(DbManager db, List<UpgradeTableXutils> upgradeList)
+    private void createAllTables(DbManager db, List<TableXutils> upgradeList)
             throws DbException {
-        for (UpgradeTableXutils upgrade : upgradeList) {
+        for (TableXutils upgrade : upgradeList) {
             TableEntity tableEntity = db.getTable(upgrade.entityType);
             if (TextUtils.isEmpty(upgrade.sqlCreateTable)) {
                 createTable(db, tableEntity);
@@ -110,9 +109,9 @@ final class UpgradeMigrationXutils extends BaseUpgradeMigration {
         }
     }
 
-    private void restoreData(DbManager db, List<UpgradeTableXutils> upgradeList)
+    private void restoreData(DbManager db, List<TableXutils> upgradeList)
             throws DbException {
-        for (UpgradeTableXutils upgrade : upgradeList) {
+        for (TableXutils upgrade : upgradeList) {
             TableEntity table = db.getTable(upgrade.entityType);
             String tableName = table.getName();
             String tempTableName = tableName.concat("_TEMP");

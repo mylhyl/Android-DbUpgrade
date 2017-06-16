@@ -86,9 +86,9 @@ public final class DbUpgrade {
             return mWith;
         }
 
-        public final class With extends AbsWith<UpgradeTable> {
-            private List<UpgradeTable> mUpgradeList = new ArrayList<>();
-            private UpgradeController mUpgradeController;
+        public final class With extends AbsWith<Table> {
+            private List<Table> mUpgradeList = new ArrayList<>();
+            private Controller mUpgradeController;
 
             private With(int mOldVersion, int mNewVersion) {
                 super(mOldVersion, mNewVersion);
@@ -100,14 +100,14 @@ public final class DbUpgrade {
              * @param tableName
              * @return
              */
-            public UpgradeController setUpgradeTable(String tableName) {
-                mUpgradeController = new UpgradeController(this, tableName);
+            public Controller setUpgradeTable(String tableName) {
+                mUpgradeController = new Controller(this, tableName);
                 return mUpgradeController;
             }
 
             @Override
             void upgrade() {
-                new UpgradeMigration().migrate(mSQLiteDatabase, mOldVersion, mUpgradeList);
+                new Migration().migrate(mSQLiteDatabase, mOldVersion, mUpgradeList);
             }
 
             SQLiteDatabase getSQLiteDatabase() {
@@ -115,7 +115,7 @@ public final class DbUpgrade {
             }
 
             @Override
-            void addUpgrade(UpgradeTable upgradeTable) {
+            void addUpgrade(Table upgradeTable) {
                 mUpgradeList.add(upgradeTable);
             }
 
@@ -140,9 +140,9 @@ public final class DbUpgrade {
             return mWith;
         }
 
-        public final class With extends AbsWith<UpgradeTableXutils> {
-            private List<UpgradeTableXutils> mUpgradeList = new ArrayList<>();
-            private UpgradeControllerXutils mUpgradeController;
+        public final class With extends AbsWith<TableXutils> {
+            private List<TableXutils> mUpgradeList = new ArrayList<>();
+            private ControllerXutils mUpgradeController;
 
             private With(int mOldVersion, int mNewVersion) {
                 super(mOldVersion, mNewVersion);
@@ -154,13 +154,13 @@ public final class DbUpgrade {
              * @param entityType
              * @return
              */
-            public UpgradeControllerXutils setUpgradeTable(Class<?> entityType) {
-                mUpgradeController = new UpgradeControllerXutils(this, entityType);
+            public ControllerXutils setUpgradeTable(Class<?> entityType) {
+                mUpgradeController = new ControllerXutils(this, entityType);
                 return mUpgradeController;
             }
 
             @Override
-            void addUpgrade(UpgradeTableXutils upgradeTable) {
+            void addUpgrade(TableXutils upgradeTable) {
                 mUpgradeList.add(upgradeTable);
             }
 
@@ -171,7 +171,7 @@ public final class DbUpgrade {
 
             @Override
             void upgrade() {
-                new UpgradeMigrationXutils().migrate(mDbManager, mOldVersion, mUpgradeList);
+                new MigrationXutils().migrate(mDbManager, mOldVersion, mUpgradeList);
             }
         }
     }
@@ -197,9 +197,9 @@ public final class DbUpgrade {
             return mWith;
         }
 
-        public final class With extends AbsWith<UpgradeTableGreenDao> {
-            private List<UpgradeTableGreenDao> mUpgradeList = new ArrayList<>();
-            private UpgradeControllerGreenDao mUpgradeController;
+        public final class With extends AbsWith<TableGreenDao> {
+            private List<TableGreenDao> mUpgradeList = new ArrayList<>();
+            private ControllerGreenDao mUpgradeController;
 
             private With(int mOldVersion, int mNewVersion) {
                 super(mOldVersion, mNewVersion);
@@ -211,14 +211,14 @@ public final class DbUpgrade {
              * @param abstractDao
              * @return
              */
-            public UpgradeControllerGreenDao setUpgradeTable(Class<? extends AbstractDao<?, ?>>
+            public ControllerGreenDao setUpgradeTable(Class<? extends AbstractDao<?, ?>>
                                                                      abstractDao) {
-                mUpgradeController = new UpgradeControllerGreenDao(this, abstractDao);
+                mUpgradeController = new ControllerGreenDao(this, abstractDao);
                 return mUpgradeController;
             }
 
             @Override
-            void addUpgrade(UpgradeTableGreenDao upgrade) {
+            void addUpgrade(TableGreenDao upgrade) {
                 mUpgradeList.add(upgrade);
             }
 
@@ -230,15 +230,15 @@ public final class DbUpgrade {
             @Override
             void upgrade() {
                 if (mDatabase != null)
-                    new UpgradeMigrationGreenDao().migrate(mDatabase, mOldVersion, mUpgradeList);
+                    new MigrationGreenDao().migrate(mDatabase, mOldVersion, mUpgradeList);
                 else
-                    new UpgradeMigrationGreenDao().migrate(mSqLiteDatabase, mOldVersion,
+                    new MigrationGreenDao().migrate(mSqLiteDatabase, mOldVersion,
                             mUpgradeList);
             }
         }
     }
 
-    abstract class AbsWith<T extends BaseUpgradeTable> {
+    abstract class AbsWith<T extends BaseTable> {
         private int mOldVersion, mNewVersion;
         int mUpgradeVersion;
 

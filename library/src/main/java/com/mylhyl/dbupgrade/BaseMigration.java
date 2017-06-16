@@ -17,7 +17,7 @@ import java.util.List;
  * Created by hupei on 2017/6/14.
  */
 
-class BaseUpgradeMigration {
+class BaseMigration {
     public static boolean DEBUG = BuildConfig.DEBUG;
     private static final String TAG = "DbUpgrade";
     private static final String SQLITE_MASTER = "sqlite_master";

@@ -3,6 +3,6 @@ package com.mylhyl.dbupgrade;
 /**
  * Created by hupei on 2017/6/16.
  */
-class BaseUpgradeTable {
+class BaseTable {
     public String sqlCreateTable;
 }

@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.mylhyl.dbupgrade.DbUpgrade;
-import com.mylhyl.dbupgrade.UpgradeControllerXutils;
 import com.mylhyl.dbupgrade.sample.xutils3.ChildEntity;
 import com.mylhyl.dbupgrade.sample.xutils3.ChildEntity2;
 import com.mylhyl.dbupgrade.sample.xutils3.ChildEntity3;

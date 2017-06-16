@@ -16,14 +16,14 @@ import java.util.List;
 /**
  * Created by hupei on 2017/6/15.
  */
-final class UpgradeMigrationGreenDao extends BaseUpgradeMigration {
+final class MigrationGreenDao extends BaseMigration {
 
-    public void migrate(SQLiteDatabase db, int oldVersion, List<UpgradeTableGreenDao> upgradeList) {
+    public void migrate(SQLiteDatabase db, int oldVersion, List<TableGreenDao> upgradeList) {
         Database database = new StandardDatabase(db);
         migrate(database, oldVersion, upgradeList);
     }
 
-    public void migrate(Database database, int oldVersion, List<UpgradeTableGreenDao> upgradeList) {
+    public void migrate(Database database, int oldVersion, List<TableGreenDao> upgradeList) {
         if (database instanceof StandardDatabase)
             setDatabase(((StandardDatabase) database).getSQLiteDatabase());
         else if (database instanceof EncryptedDatabase)
@@ -51,8 +51,8 @@ final class UpgradeMigrationGreenDao extends BaseUpgradeMigration {
         }
     }
 
-    private void generateTempTables(Database db, List<UpgradeTableGreenDao> upgradeList) {
-        for (UpgradeTableGreenDao upgradeTable : upgradeList) {
+    private void generateTempTables(Database db, List<TableGreenDao> upgradeList) {
+        for (TableGreenDao upgradeTable : upgradeList) {
             Class<? extends AbstractDao<?, ?>> abstractDao = upgradeTable.abstractDao;
             DaoConfig daoConfig = new DaoConfig(db, abstractDao);
             String tableName = daoConfig.tablename;
@@ -65,15 +65,15 @@ final class UpgradeMigrationGreenDao extends BaseUpgradeMigration {
     }
 
 
-    private void dropAllTables(Database db, List<UpgradeTableGreenDao> upgradeList) {
-        for (UpgradeTableGreenDao upgradeTable : upgradeList) {
+    private void dropAllTables(Database db, List<TableGreenDao> upgradeList) {
+        for (TableGreenDao upgradeTable : upgradeList) {
             reflectMethod(db, "dropTable", true, upgradeTable);
         }
         printLog("【Drop all table】");
     }
 
-    private void createAllTables(Database db, List<UpgradeTableGreenDao> upgradeList) {
-        for (UpgradeTableGreenDao upgradeTable : upgradeList) {
+    private void createAllTables(Database db, List<TableGreenDao> upgradeList) {
+        for (TableGreenDao upgradeTable : upgradeList) {
             if (TextUtils.isEmpty(upgradeTable.sqlCreateTable))
                 reflectMethod(db, "createTable", false, upgradeTable);
             else db.execSQL(upgradeTable.sqlCreateTable);
@@ -85,7 +85,7 @@ final class UpgradeMigrationGreenDao extends BaseUpgradeMigration {
      * dao class already define the sql exec method, so just invoke it
      */
     private void reflectMethod(Database db, String methodName, boolean isExists,
-                               UpgradeTableGreenDao upgradeTable) {
+                               TableGreenDao upgradeTable) {
         try {
             Class<? extends AbstractDao<?, ?>> abstractDao = upgradeTable.abstractDao;
             Method method = abstractDao.getDeclaredMethod(methodName, Database.class, boolean
@@ -100,8 +100,8 @@ final class UpgradeMigrationGreenDao extends BaseUpgradeMigration {
         }
     }
 
-    private void restoreData(Database db, List<UpgradeTableGreenDao> upgradeList) {
-        for (UpgradeTableGreenDao upgradeTable : upgradeList) {
+    private void restoreData(Database db, List<TableGreenDao> upgradeList) {
+        for (TableGreenDao upgradeTable : upgradeList) {
             Class<? extends AbstractDao<?, ?>> abstractDao = upgradeTable.abstractDao;
             DaoConfig daoConfig = new DaoConfig(db, abstractDao);
             String tableName = daoConfig.tablename;
