@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.mylhyl.dbupgrade.DbUpgrade;
+import com.mylhyl.dbupgrade.UpgradeControllerXutils;
 import com.mylhyl.dbupgrade.sample.xutils3.ChildEntity;
 import com.mylhyl.dbupgrade.sample.xutils3.ChildEntity2;
 import com.mylhyl.dbupgrade.sample.xutils3.ChildEntity3;
@@ -183,17 +184,19 @@ public class XutilsFragment extends Fragment {
                 DbUpgrade dbUpgrade = new DbUpgrade(oldVersion, newVersion);
                 DbUpgrade.Xutils with = dbUpgrade.withXutils(db);
                 if (oldVersion == 1) {
-                    with.setUpgradeTable(ParentEntity2.class, 1)
+                    with.setUpgradeVersion(1)
+                            .setUpgradeTable(ParentEntity2.class)
 //                            .setSqlCreateTable("")
-                            .setUpgradeTable(ChildEntity2.class, 1)
+                            .setUpgradeTable(ChildEntity2.class)
                             //每个版本都必须 upgrade()一次
                             .upgrade();
 
                     if (dbVersion == 3) oldVersion++;
                 }
                 if (oldVersion == 2) {
-                    with.setUpgradeTable(ParentEntity3.class, 2)
-                            .setUpgradeTable(ChildEntity3.class, 2)
+                    with.setUpgradeVersion(2)
+                            .setUpgradeTable(ParentEntity3.class)
+                            .setUpgradeTable(ChildEntity3.class)
                             //每个版本都必须 upgrade()一次
                             .upgrade();
                 }

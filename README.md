@@ -29,12 +29,16 @@
 ```
 然而该库只需要这样
 ```java
-    DbUpgrade dbUpgrade = new DbUpgrade(oldVersion);
-    DbUpgrade.Xutils with = dbUpgrade.withXutils(db);//切换到Xutil3
-    with.setEntityType(TableA.class, 1)
-            .upgrade();//每个版本都必须 upgrade()一次
-
-    with.setEntityType(TableB.class, 2)
-            .setEntityType(TableC.class, 2)
-            .upgrade();//每个版本都必须 upgrade()一次
+        DbUpgrade dbUpgrade = new DbUpgrade(oldVersion, newVersion);
+        DbUpgrade.GreenDao with = dbUpgrade.withGreenDao(db);//切换greenDao
+            with.setUpgradeVersion(1)
+                    .setUpgradeTable(TableA.class)
+                    //每个版本都必须 upgrade()一次
+                    .upgrade();
+        
+            with.setUpgradeVersion(2)
+                    .setUpgradeTable(TableB.class)
+                    .setUpgradeTable(TableC.class)
+                    //每个版本都必须 upgrade()一次
+                    .upgrade();
 ```

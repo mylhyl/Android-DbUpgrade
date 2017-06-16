@@ -9,15 +9,12 @@ import java.util.List;
  */
 
 public final class UpgradeController {
-    private DbUpgrade.Native mNative;
+    private DbUpgrade.Native.With mWith;
     private UpgradeTable mUpgrade;
-    private int mUpgradeVersion;
 
-    private UpgradeController() {
-    }
-
-    UpgradeController(DbUpgrade.Native aNative) {
-        this.mNative = aNative;
+    UpgradeController(DbUpgrade.Native.With with, String tableName) {
+        this.mWith = with;
+        this.mUpgrade = new UpgradeTable(tableName);
     }
 
     /**
@@ -29,7 +26,7 @@ public final class UpgradeController {
      */
     public UpgradeController addColumn(String columnName, ColumnType fieldType) {
         //列不存在才添加
-        if (!UpgradeMigration.columnIsExist(mNative.getSQLiteDatabase(), mUpgrade.tableName,
+        if (!UpgradeMigration.columnIsExist(mWith.getSQLiteDatabase(), mUpgrade.tableName,
                 columnName))
             mUpgrade.addColumn(columnName, fieldType);
         return this;
@@ -43,7 +40,7 @@ public final class UpgradeController {
      */
     public UpgradeController removeColumn(String columnName) {
         //列存在才添加
-        if (UpgradeMigration.columnIsExist(mNative.getSQLiteDatabase(), mUpgrade.tableName,
+        if (UpgradeMigration.columnIsExist(mWith.getSQLiteDatabase(), mUpgrade.tableName,
                 columnName))
             mUpgrade.removeColumn(columnName);
         return this;
@@ -60,35 +57,29 @@ public final class UpgradeController {
         return this;
     }
 
-    public UpgradeController setTableName(String tableName, int upgradeVersion) {
-        addUpgrade();
-        return mNative.setTableName(tableName, upgradeVersion);
+    public UpgradeController setUpgradeTable(String tableName) {
+        if (mWith.isUpgrade()) addUpgrade();
+        return mWith.setUpgradeTable(tableName);
     }
 
     public void upgrade() {
-        addUpgrade();
-        if (mNative.getOldVersion() == mUpgradeVersion) {
-            mNative.upgrade();
-            mNative.addOldVersion();
+        if (mWith.isUpgrade()) {
+            addUpgrade();
+            mWith.upgrade();
+            mWith.addOldVersion();
         }
-        mNative.clearUpgradeList();
-    }
-
-    UpgradeController newTableName(String tableName, int upgradeVersion) {
-        this.mUpgrade = new UpgradeTable(tableName);
-        this.mUpgradeVersion = upgradeVersion;
-        return this;
+        mWith.clearUpgradeList();
     }
 
     void addUpgrade() {
         setSqlCreateTable();
-        mNative.addUpgrade(mUpgrade);
+        mWith.addUpgrade(mUpgrade);
     }
 
     private void setSqlCreateTable() {
         //判断是否有自定义sql
         if (!TextUtils.isEmpty(mUpgrade.sqlCreateTable)) return;
-        String tableSql = UpgradeMigration.createTableSql(mNative.getSQLiteDatabase(), mUpgrade
+        String tableSql = UpgradeMigration.createTableSql(mWith.getSQLiteDatabase(), mUpgrade
                 .tableName);
         //检查是否有删除字段
         List<String> removeColumns = mUpgrade.removeColumns;

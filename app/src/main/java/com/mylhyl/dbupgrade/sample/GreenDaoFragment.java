@@ -194,15 +194,17 @@ public class GreenDaoFragment extends Fragment {
             DbUpgrade dbUpgrade = new DbUpgrade(oldVersion, newVersion);
             DbUpgrade.GreenDao with = dbUpgrade.withGreenDao(db);
             if (oldVersion == 1) {
-                with.setAbstractDao(DeviceEntityDao.class, 1)
-                        .setAbstractDao(UserEntityDao.class, 1)
+                with.setUpgradeVersion(1)
+                        .setUpgradeTable(DeviceEntityDao.class)
+                        .setUpgradeTable(UserEntityDao.class)
                         //每个版本都必须 upgrade()一次
                         .upgrade();
                 oldVersion++;
             }
             if (oldVersion == 2) {
-                with.setAbstractDao(DeviceEntityDao.class, 2)
-                        .setAbstractDao(UserEntityDao.class, 2)
+                with.setUpgradeVersion(2)
+                        .setUpgradeTable(DeviceEntityDao.class)
+                        .setUpgradeTable(UserEntityDao.class)
                         //每个版本都必须 upgrade()一次
                         .upgrade();
             }

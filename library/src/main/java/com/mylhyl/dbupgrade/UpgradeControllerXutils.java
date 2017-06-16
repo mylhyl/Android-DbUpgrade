@@ -6,14 +6,12 @@ package com.mylhyl.dbupgrade;
  */
 
 public final class UpgradeControllerXutils {
-    private DbUpgrade.Xutils mXutils;
+    private DbUpgrade.Xutils.With mWith;
     private UpgradeTableXutils upgradeTable;
 
-    private UpgradeControllerXutils() {
-    }
-
-    UpgradeControllerXutils(DbUpgrade.Xutils xutils) {
-        this.mXutils = xutils;
+    UpgradeControllerXutils(DbUpgrade.Xutils.With with, Class<?> entityType) {
+        this.mWith = with;
+        this.upgradeTable = new UpgradeTableXutils(entityType);
     }
 
     /**
@@ -31,12 +29,11 @@ public final class UpgradeControllerXutils {
      * 表配置结束，并配置另一个表
      *
      * @param entityType
-     * @param upgradeVersion
      * @return
      */
-    public UpgradeControllerXutils setUpgradeTable(Class<?> entityType, int upgradeVersion) {
-        if (isUpgrade()) addUpgrade();
-        return mXutils.setUpgradeTable(entityType, upgradeVersion);
+    public UpgradeControllerXutils setUpgradeTable(Class<?> entityType) {
+        if (mWith.isUpgrade()) addUpgrade();
+        return mWith.setUpgradeTable(entityType);
     }
 
     /**
@@ -45,25 +42,15 @@ public final class UpgradeControllerXutils {
      * @return
      */
     public void upgrade() {
-        if (isUpgrade()) {
+        if (mWith.isUpgrade()) {
             addUpgrade();
-            mXutils.upgrade();
-            mXutils.addOldVersion();
+            mWith.upgrade();
+            mWith.addOldVersion();
         }
-        mXutils.clearUpgradeList();
-    }
-
-    private boolean isUpgrade() {
-        return mXutils.getOldVersion() == upgradeTable.upgradeVersion
-                && upgradeTable.upgradeVersion < mXutils.getNewVersion();
-    }
-
-    UpgradeControllerXutils newUpgradeTable(Class<?> entityType, int upgradeVersion) {
-        this.upgradeTable = new UpgradeTableXutils(upgradeVersion, entityType);
-        return this;
+        mWith.clearUpgradeList();
     }
 
     void addUpgrade() {
-        mXutils.addUpgrade(upgradeTable);
+        mWith.addUpgrade(upgradeTable);
     }
 }

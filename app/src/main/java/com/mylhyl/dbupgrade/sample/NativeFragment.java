@@ -190,25 +190,25 @@ public class NativeFragment extends Fragment {
                 DbUpgrade dbUpgrade = new DbUpgrade(oldVersion, newVersion);
                 DbUpgrade.Native with = dbUpgrade.with(db.getDatabase());
                 if (update1to2) {
-                    with.setTableName("School", 1)
+                    with.setUpgradeVersion(1)
+                            .setUpgradeTable("School")
                             .addColumn("studentId", ColumnType.INTEGER)
                             .removeColumn("name")
 //                            .setSqlCreateTable(SchoolEntity.sqlCreate3.toString())
 
-                            .setTableName("Student", 1)
+                            .setUpgradeTable("Student")
                             .addColumn("sex", ColumnType.TEXT)
                             //每个版本都必须 upgrade()一次
                             .upgrade();
                 }
                 if (update2to3) {
-                    with.setTableName("School", 2)
+                    with.setUpgradeVersion(2)
+                            .setUpgradeTable("School")
                             .addColumn("address", ColumnType.TEXT)
                             .addColumn("grade", ColumnType.TEXT)
-//                            .build()
 
-                            .setTableName("Student", 2)
+                            .setUpgradeTable("Student")
                             .addColumn("age", ColumnType.INTEGER)
-//                            .build()
                             //每个版本都必须 upgrade()一次
                             .upgrade();
                 }

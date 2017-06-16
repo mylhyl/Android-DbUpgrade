@@ -8,15 +8,13 @@ import org.greenrobot.greendao.AbstractDao;
  */
 
 public final class UpgradeControllerGreenDao {
-    private DbUpgrade.GreenDao mGreenDao;
+    private DbUpgrade.GreenDao.With mWith;
     private UpgradeTableGreenDao mUpgrade;
-    private int mUpgradeVersion;
 
-    private UpgradeControllerGreenDao() {
-    }
-
-    UpgradeControllerGreenDao(DbUpgrade.GreenDao greenDao) {
-        this.mGreenDao = greenDao;
+    UpgradeControllerGreenDao(DbUpgrade.GreenDao.With with, Class<? extends AbstractDao<?, ?>>
+            abstractDao) {
+        this.mWith = with;
+        this.mUpgrade = new UpgradeTableGreenDao(abstractDao);
     }
 
     /**
@@ -34,13 +32,12 @@ public final class UpgradeControllerGreenDao {
      * 表配置结束，并配置另一个表
      *
      * @param abstractDao
-     * @param upgradeVersion
      * @return
      */
-    public UpgradeControllerGreenDao setAbstractDao(Class<? extends AbstractDao<?, ?>> abstractDao,
-                                                    int upgradeVersion) {
-        addUpgrade();
-        return mGreenDao.setAbstractDao(abstractDao, upgradeVersion);
+    public UpgradeControllerGreenDao setUpgradeTable(Class<? extends AbstractDao<?, ?>>
+                                                             abstractDao) {
+        if (mWith.isUpgrade()) addUpgrade();
+        return mWith.setUpgradeTable(abstractDao);
     }
 
     /**
@@ -49,23 +46,15 @@ public final class UpgradeControllerGreenDao {
      * @return
      */
     public void upgrade() {
-        addUpgrade();
-        if (mGreenDao.getOldVersion() == mUpgradeVersion) {
-            mGreenDao.upgrade();
-            mGreenDao.addOldVersion();
+        if (mWith.isUpgrade()) {
+            addUpgrade();
+            mWith.upgrade();
+            mWith.addOldVersion();
         }
-        mGreenDao.clearUpgradeList();
+        mWith.clearUpgradeList();
     }
 
-    UpgradeControllerGreenDao newAbstractDao(Class<? extends AbstractDao<?, ?>> abstractDao,
-                                             int upgradeVersion) {
-        this.mUpgrade = new UpgradeTableGreenDao(abstractDao);
-        this.mUpgradeVersion = upgradeVersion;
-        return this;
-    }
-
-    DbUpgrade.GreenDao addUpgrade() {
-        mGreenDao.addUpgrade(mUpgrade);
-        return mGreenDao;
+    void addUpgrade() {
+        mWith.addUpgrade(mUpgrade);
     }
 }

@@ -6,8 +6,7 @@ package com.mylhyl.dbupgrade;
 final class UpgradeTableXutils extends BaseUpgradeTable {
     public Class<?> entityType;
 
-    public UpgradeTableXutils(int upgradeVersion, Class<?> entityType) {
-        this.upgradeVersion = upgradeVersion;
+    public UpgradeTableXutils(Class<?> entityType) {
         this.entityType = entityType;
     }
 }
