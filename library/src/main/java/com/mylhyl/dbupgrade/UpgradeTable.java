@@ -9,7 +9,7 @@ import java.util.List;
  * Created by hupei on 2017/6/9.
  */
 
-final class UpgradeTable {
+final class UpgradeTable extends BaseUpgradeTable {
     public String tableName;
     public String sqlCreateTable;
     public LinkedHashMap<String, ColumnType> addColumns = new LinkedHashMap<>();

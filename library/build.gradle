@@ -1,4 +1,6 @@
 apply plugin: 'com.android.library'
+apply plugin: 'maven'
+apply plugin: 'com.novoda.bintray-release'
 
 android {
     compileSdkVersion 25
@@ -8,9 +10,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 25
         versionCode 1
-        versionName "1.0"
-
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        versionName "2017.6.15"
 
     }
     buildTypes {
@@ -19,9 +19,22 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {
     provided 'org.xutils:xutils:3.+'
     provided 'org.greenrobot:greendao:3.+'
+}
+
+
+publish {
+    userOrg = 'mylhyl'
+    groupId = 'com.mylhyl'
+    artifactId = 'DbUpgrade'
+    version = '1.0.0'
+    description = 'android sqlite table upgrade update and data migrate'
+    website = "https://github.com/mylhyl/Android-DbUpgrade"
 }

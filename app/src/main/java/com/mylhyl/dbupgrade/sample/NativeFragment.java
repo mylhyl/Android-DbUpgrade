@@ -187,7 +187,7 @@ public class NativeFragment extends Fragment {
             public void onUpgrade(DbManager db, int oldVersion, int newVersion) {
                 if (newVersion <= oldVersion) return;
 
-                DbUpgrade dbUpgrade = new DbUpgrade(oldVersion);
+                DbUpgrade dbUpgrade = new DbUpgrade(oldVersion, newVersion);
                 DbUpgrade.Native with = dbUpgrade.with(db.getDatabase());
                 if (update1to2) {
                     with.setTableName("School", 1)

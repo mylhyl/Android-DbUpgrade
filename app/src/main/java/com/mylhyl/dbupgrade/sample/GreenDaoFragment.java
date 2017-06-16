@@ -191,7 +191,7 @@ public class GreenDaoFragment extends Fragment {
         public void onUpgrade(Database db, int oldVersion, int newVersion) {
             if (newVersion <= oldVersion) return;
 
-            DbUpgrade dbUpgrade = new DbUpgrade(oldVersion);
+            DbUpgrade dbUpgrade = new DbUpgrade(oldVersion, newVersion);
             DbUpgrade.GreenDao with = dbUpgrade.withGreenDao(db);
             if (oldVersion == 1) {
                 with.setAbstractDao(DeviceEntityDao.class, 1)

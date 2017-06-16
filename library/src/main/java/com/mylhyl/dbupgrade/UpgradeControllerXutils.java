@@ -7,8 +7,7 @@ package com.mylhyl.dbupgrade;
 
 public final class UpgradeControllerXutils {
     private DbUpgrade.Xutils mXutils;
-    private UpgradeTableXutils mUpgrade;
-    private int mUpgradeVersion;
+    private UpgradeTableXutils upgradeTable;
 
     private UpgradeControllerXutils() {
     }
@@ -24,7 +23,7 @@ public final class UpgradeControllerXutils {
      * @return
      */
     public UpgradeControllerXutils setSqlCreateTable(String sqlCreateTable) {
-        mUpgrade.sqlCreateTable = sqlCreateTable;
+        upgradeTable.sqlCreateTable = sqlCreateTable;
         return this;
     }
 
@@ -35,9 +34,9 @@ public final class UpgradeControllerXutils {
      * @param upgradeVersion
      * @return
      */
-    public UpgradeControllerXutils setEntityType(Class<?> entityType, int upgradeVersion) {
-        addUpgrade();
-        return mXutils.setEntityType(entityType, upgradeVersion);
+    public UpgradeControllerXutils setUpgradeTable(Class<?> entityType, int upgradeVersion) {
+        if (isUpgrade()) addUpgrade();
+        return mXutils.setUpgradeTable(entityType, upgradeVersion);
     }
 
     /**
@@ -46,21 +45,25 @@ public final class UpgradeControllerXutils {
      * @return
      */
     public void upgrade() {
-        addUpgrade();
-        if (mXutils.getOldVersion() == mUpgradeVersion) {
+        if (isUpgrade()) {
+            addUpgrade();
             mXutils.upgrade();
             mXutils.addOldVersion();
         }
         mXutils.clearUpgradeList();
     }
 
+    private boolean isUpgrade() {
+        return mXutils.getOldVersion() == upgradeTable.upgradeVersion
+                && upgradeTable.upgradeVersion < mXutils.getNewVersion();
+    }
+
     UpgradeControllerXutils newUpgradeTable(Class<?> entityType, int upgradeVersion) {
-        this.mUpgrade = new UpgradeTableXutils(entityType);
-        this.mUpgradeVersion = upgradeVersion;
+        this.upgradeTable = new UpgradeTableXutils(upgradeVersion, entityType);
         return this;
     }
 
     void addUpgrade() {
-        mXutils.addUpgrade(mUpgrade);
+        mXutils.addUpgrade(upgradeTable);
     }
 }

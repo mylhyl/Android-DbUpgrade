@@ -180,30 +180,20 @@ public class XutilsFragment extends Fragment {
             @Override
             public void onUpgrade(DbManager db, int oldVersion, int newVersion) {
                 if (newVersion <= oldVersion) return;
-                for (int i = oldVersion; i < newVersion; i++) {
-                    switch (i) {
-                        case 1:
-                            break;
-                        case 2:
-                            break;
-                        default:
-                            break;
-                    }
-                }
-                DbUpgrade dbUpgrade = new DbUpgrade(oldVersion);
+                DbUpgrade dbUpgrade = new DbUpgrade(oldVersion, newVersion);
                 DbUpgrade.Xutils with = dbUpgrade.withXutils(db);
                 if (oldVersion == 1) {
-                    with.setEntityType(ParentEntity2.class, 1)
+                    with.setUpgradeTable(ParentEntity2.class, 1)
 //                            .setSqlCreateTable("")
-                            .setEntityType(ChildEntity2.class, 1)
+                            .setUpgradeTable(ChildEntity2.class, 1)
                             //每个版本都必须 upgrade()一次
                             .upgrade();
 
                     if (dbVersion == 3) oldVersion++;
                 }
                 if (oldVersion == 2) {
-                    with.setEntityType(ParentEntity3.class, 2)
-                            .setEntityType(ChildEntity3.class, 2)
+                    with.setUpgradeTable(ParentEntity3.class, 2)
+                            .setUpgradeTable(ChildEntity3.class, 2)
                             //每个版本都必须 upgrade()一次
                             .upgrade();
                 }

@@ -17,10 +17,11 @@ public final class DbUpgrade {
     private Native mNative;
     private Xutils mXutils;
     private GreenDao mGreenDao;
-    private int mOldVersion;
+    private int mOldVersion, mNewVersion;
 
-    public DbUpgrade(int oldVersion) {
+    public DbUpgrade(int oldVersion, int newVersion) {
         this.mOldVersion = oldVersion;
+        this.mNewVersion = newVersion;
     }
 
     /**
@@ -30,7 +31,7 @@ public final class DbUpgrade {
      * @return
      */
     public Native with(SQLiteDatabase db) {
-        mNative = new Native(db);
+        mNative = new Native(mOldVersion, mNewVersion, db);
         return mNative;
     }
 
@@ -41,7 +42,7 @@ public final class DbUpgrade {
      * @return
      */
     public Xutils withXutils(DbManager db) {
-        mXutils = new Xutils(db);
+        mXutils = new Xutils(mOldVersion, mNewVersion, db);
         return mXutils;
     }
 
@@ -52,7 +53,7 @@ public final class DbUpgrade {
      * @return
      */
     public GreenDao withGreenDao(Database db) {
-        mGreenDao = new GreenDao(db);
+        mGreenDao = new GreenDao(mOldVersion, mNewVersion, db);
         return mGreenDao;
     }
 
@@ -62,21 +63,50 @@ public final class DbUpgrade {
      * @param db
      * @return
      */
-    public Native withGreenDao(SQLiteDatabase db) {
-        mNative = new Native(db);
-        return mNative;
+    public GreenDao withGreenDao(SQLiteDatabase db) {
+        mGreenDao = new GreenDao(mOldVersion, mNewVersion, db);
+        return mGreenDao;
     }
 
-    public final class Native {
+    Xutils getXutils() {
+        return mXutils;
+    }
+
+    abstract class With<T extends BaseUpgradeTable> {
+        private int mOldVersion, mNewVersion;
+
+        public With(int mOldVersion, int mNewVersion) {
+            this.mOldVersion = mOldVersion;
+            this.mNewVersion = mNewVersion;
+        }
+
+        final int getOldVersion() {
+            return mOldVersion;
+        }
+
+        final void addOldVersion() {
+            mOldVersion++;
+        }
+
+        final int getNewVersion() {
+            return mNewVersion;
+        }
+
+        abstract void addUpgrade(T upgradeTable);
+
+        abstract void clearUpgradeList();
+
+        abstract void upgrade();
+    }
+
+    public final class Native extends With<UpgradeTable> {
         private SQLiteDatabase mSQLiteDatabase;
         private List<UpgradeTable> mUpgradeList = new ArrayList<>();
         private UpgradeController mUpgradeController;
 
-        private Native() {
-        }
-
-        Native(SQLiteDatabase mSQLiteDatabase) {
-            this.mSQLiteDatabase = mSQLiteDatabase;
+        private Native(int mOldVersion, int mNewVersion, SQLiteDatabase db) {
+            super(mOldVersion, mNewVersion);
+            this.mSQLiteDatabase = db;
         }
 
         /**
@@ -92,40 +122,34 @@ public final class DbUpgrade {
             return mUpgradeController;
         }
 
-        int getOldVersion() {
-            return mOldVersion;
-        }
-
-        void addOldVersion() {
-            mOldVersion++;
-        }
-
-        void addUpgrade(UpgradeTable upgrade) {
-            mUpgradeList.add(upgrade);
-        }
-
-        void clearUpgradeList() {
-            mUpgradeList.clear();
-        }
-
-        public void upgrade() {
+        @Override
+        void upgrade() {
             new UpgradeMigration().migrate(mSQLiteDatabase, mOldVersion, mUpgradeList);
         }
 
         SQLiteDatabase getSQLiteDatabase() {
             return mSQLiteDatabase;
         }
+
+        @Override
+        void addUpgrade(UpgradeTable upgradeTable) {
+            mUpgradeList.add(upgradeTable);
+        }
+
+        @Override
+        void clearUpgradeList() {
+            mUpgradeList.clear();
+        }
     }
 
-    public final class Xutils {
+    public final class Xutils extends With<UpgradeTableXutils> {
+
         private DbManager mDbManager;
         private List<UpgradeTableXutils> mUpgradeList = new ArrayList<>();
         private UpgradeControllerXutils mUpgradeController;
 
-        private Xutils() {
-        }
-
-        Xutils(DbManager db) {
+        private Xutils(int mOldVersion, int mNewVersion, DbManager db) {
+            super(mOldVersion, mNewVersion);
             this.mDbManager = db;
         }
 
@@ -136,49 +160,45 @@ public final class DbUpgrade {
          * @param upgradeVersion entityType 实体类 从 upgradeVersion 版本升级
          * @return
          */
-        public UpgradeControllerXutils setEntityType(Class<?> entityType, int upgradeVersion) {
+        public UpgradeControllerXutils setUpgradeTable(Class<?> entityType, int upgradeVersion) {
             mUpgradeController = new UpgradeControllerXutils(this);
             mUpgradeController.newUpgradeTable(entityType, upgradeVersion);
             return mUpgradeController;
         }
 
-        int getOldVersion() {
-            return mOldVersion;
+        @Override
+        void addUpgrade(UpgradeTableXutils upgradeTable) {
+            mUpgradeList.add(upgradeTable);
         }
 
-        void addOldVersion() {
-            mOldVersion++;
-        }
-
-        void addUpgrade(UpgradeTableXutils upgrade) {
-            mUpgradeList.add(upgrade);
-        }
-
+        @Override
         void clearUpgradeList() {
             mUpgradeList.clear();
         }
 
+        @Override
         void upgrade() {
             new UpgradeMigrationXutils().migrate(mDbManager, mOldVersion, mUpgradeList);
         }
+
     }
 
-    public final class GreenDao {
+    public final class GreenDao extends With<UpgradeTableGreenDao> {
         private Database mDatabase;
         private SQLiteDatabase mSqLiteDatabase;
         private List<UpgradeTableGreenDao> mUpgradeList = new ArrayList<>();
         private UpgradeControllerGreenDao mUpgradeController;
 
-        private GreenDao() {
-        }
-
-        GreenDao(Database db) {
+        private GreenDao(int mOldVersion, int mNewVersion, Database db) {
+            super(mOldVersion, mNewVersion);
             this.mDatabase = db;
         }
 
-        GreenDao(SQLiteDatabase sqLiteDatabase) {
-            this.mSqLiteDatabase = sqLiteDatabase;
+        private GreenDao(int mOldVersion, int mNewVersion, SQLiteDatabase db) {
+            super(mOldVersion, mNewVersion);
+            this.mSqLiteDatabase = db;
         }
+
 
         /**
          * 设置需要升级的 AbstractDao 类
@@ -194,22 +214,17 @@ public final class DbUpgrade {
             return mUpgradeController;
         }
 
-        int getOldVersion() {
-            return mOldVersion;
-        }
-
-        void addOldVersion() {
-            mOldVersion++;
-        }
-
+        @Override
         void addUpgrade(UpgradeTableGreenDao upgrade) {
             mUpgradeList.add(upgrade);
         }
 
+        @Override
         void clearUpgradeList() {
             mUpgradeList.clear();
         }
 
+        @Override
         void upgrade() {
             if (mDatabase != null)
                 new UpgradeMigrationGreenDao().migrate(mDatabase, mOldVersion, mUpgradeList);
