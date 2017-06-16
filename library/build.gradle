@@ -25,8 +25,10 @@ android {
 }
 
 dependencies {
-    provided 'org.xutils:xutils:3.+'
-    provided 'org.greenrobot:greendao:3.+'
+    provided 'org.xutils:xutils:+'
+    provided 'org.greenrobot:greendao:+'
+    provided files('libs/ormlite-android-5.0.jar')
+    provided files('libs/ormlite-core-5.0.jar')
 }
 
 

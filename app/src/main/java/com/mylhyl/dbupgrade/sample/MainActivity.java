@@ -35,6 +35,9 @@ public class MainActivity extends AppCompatActivity implements TypesFragment
             case 2:
                 fragment = GreenDaoFragment.newInstance();
                 break;
+            case 3:
+                fragment = OrmLiteFragment.newInstance();
+                break;
         }
 
         if (fragment != null)

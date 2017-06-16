@@ -11,35 +11,28 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.mylhyl.dbupgrade.DbUpgrade;
-import com.mylhyl.dbupgrade.sample.xutils3.ChildEntity;
-import com.mylhyl.dbupgrade.sample.xutils3.ChildEntity2;
-import com.mylhyl.dbupgrade.sample.xutils3.ChildEntity3;
-import com.mylhyl.dbupgrade.sample.xutils3.ParentEntity;
-import com.mylhyl.dbupgrade.sample.xutils3.ParentEntity2;
-import com.mylhyl.dbupgrade.sample.xutils3.ParentEntity3;
-import com.mylhyl.dbupgrade.xuitls3.Xutils;
-
-import org.xutils.DbManager;
-import org.xutils.ex.DbException;
-import org.xutils.x;
+import com.j256.ormlite.table.TableUtils;
+import com.mylhyl.dbupgrade.sample.ormlite.DatabaseHelper;
+import com.mylhyl.dbupgrade.sample.ormlite.User;
+import com.mylhyl.dbupgrade.sample.ormlite.User1;
+import com.mylhyl.dbupgrade.sample.ormlite.User2;
 
 import java.io.File;
-import java.io.IOException;
+import java.sql.SQLException;
 
 
-public class XutilsFragment extends Fragment {
+public class OrmLiteFragment extends Fragment {
     private MainActivity mainActivity;
     private TextView textView;
     private int dbVersion = 1;
     private String dbName = "dbupgradexutils.db";
     private File dbDir = null;
 
-    public XutilsFragment() {
+    public OrmLiteFragment() {
     }
 
-    public static XutilsFragment newInstance() {
-        XutilsFragment fragment = new XutilsFragment();
+    public static OrmLiteFragment newInstance() {
+        OrmLiteFragment fragment = new OrmLiteFragment();
         return fragment;
     }
 
@@ -102,101 +95,77 @@ public class XutilsFragment extends Fragment {
 
     private void onCreateDb() {
         dbVersion = 1;
-
-        ParentEntity parentEntity = new ParentEntity();
-
-        ChildEntity childEntity = new ChildEntity();
-
-        DbManager xdb = getXutilsDb();
+        DatabaseHelper.DB_VERSION = dbVersion;
+        User user = new User();
+        DatabaseHelper helper = DatabaseHelper.getHelper(getContext());
         try {
-            xdb.replace(parentEntity);
-            xdb.replace(childEntity);
+            helper.getUserDao().create(user);
             onFindColumn();
-        } catch (DbException e) {
+
+            if (user != null) textView.append("\n" + user.toString());
+
+        } catch (SQLException e) {
             e.printStackTrace();
         }
+
     }
 
     private void onDel() {
+        DatabaseHelper helper = DatabaseHelper.getHelper(getContext());
         try {
-            getXutilsDb().close();
-        } catch (IOException e) {
+            TableUtils.dropTable(helper.getUserDao(), true);
+            helper.close();
+            textView.setText("删除成功");
+        } catch (SQLException e) {
             e.printStackTrace();
         }
-        File file = new File(dbDir, dbName);
-        if (file != null && file.exists()) file.delete();
-        textView.setText("删除成功");
     }
 
     private void onFindColumn() {
-        String[] parents = mainActivity.getColumns(getXutilsDb().getDatabase(), "parent");
+        DatabaseHelper helper = DatabaseHelper.getHelper(getContext());
+        String[] parents = mainActivity.getColumns(helper.getReadableDatabase(), "tb_user");
         String columnParent = TextUtils.join(",", parents);
-        textView.setText("parent");
+        textView.setText("User");
         textView.append("\n\t");
         textView.append(columnParent);
-        textView.append("\n");
-        textView.append("child");
-        textView.append("\n\t");
-        String[] childs = mainActivity.getColumns(getXutilsDb().getDatabase(), "child");
-        String columnChild = TextUtils.join(",", childs);
-        textView.append(columnChild);
     }
 
     private void on1Update2() {
         dbVersion = 2;
+        DatabaseHelper.DB_VERSION = dbVersion;
+        DatabaseHelper helper = DatabaseHelper.getHelper(getContext());
+        onFindColumn();
         try {
-            getXutilsDb().close();
-        } catch (IOException e) {
+            User1 user = helper.getUser1Dao().queryForId(1);
+            if (user != null) textView.append("\n" + user.toString());
+        } catch (SQLException e) {
             e.printStackTrace();
         }
-        onFindColumn();
     }
 
     private void on2Update3() {
         dbVersion = 3;
+        DatabaseHelper.DB_VERSION = dbVersion;
+        DatabaseHelper helper = DatabaseHelper.getHelper(getContext());
+        onFindColumn();
         try {
-            getXutilsDb().close();
-        } catch (IOException e) {
+            User2 user = helper.getUser2Dao().queryForId(1);
+            if (user != null) textView.append("\n" + user.toString());
+        } catch (SQLException e) {
             e.printStackTrace();
         }
-        onFindColumn();
     }
 
     private void on1Update3() {
         dbVersion = 3;
+        DatabaseHelper.DB_VERSION = dbVersion;
+        DatabaseHelper helper = DatabaseHelper.getHelper(getContext());
+        onFindColumn();
         try {
-            getXutilsDb().close();
-        } catch (IOException e) {
+            User2 user = helper.getUser2Dao().queryForId(1);
+            if (user != null) textView.append("\n" + user.toString());
+        } catch (SQLException e) {
             e.printStackTrace();
         }
-        onFindColumn();
-    }
-
-    private DbManager getXutilsDb() {
-        DbManager.DaoConfig daoConfig = new DbManager.DaoConfig();
-        daoConfig.setDbName(dbName);
-        daoConfig.setDbDir(dbDir);
-        daoConfig.setDbVersion(dbVersion);
-        daoConfig.setDbUpgradeListener(new DbManager.DbUpgradeListener() {
-            @Override
-            public void onUpgrade(DbManager db, int oldVersion, int newVersion) {
-                if (newVersion <= oldVersion) return;
-                DbUpgrade dbUpgrade = new DbUpgrade(oldVersion, newVersion);
-                Xutils with = dbUpgrade.withXutils(db);
-                with.setUpgradeVersion(1)
-                        .setUpgradeTable(ParentEntity2.class)
-                        .setSqlCreateTable("")
-                        .setUpgradeTable(ChildEntity2.class)
-                        //每个版本都必须 upgrade()一次
-                        .upgrade();
-
-                with.setUpgradeVersion(2)
-                        .setUpgradeTable(ParentEntity3.class)
-                        .setUpgradeTable(ChildEntity3.class)
-                        //每个版本都必须 upgrade()一次
-                        .upgrade();
-            }
-        });
-        return x.getDb(daoConfig);
     }
 }

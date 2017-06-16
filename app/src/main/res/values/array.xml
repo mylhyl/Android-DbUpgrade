@@ -4,5 +4,6 @@
         <item>原生</item>
         <item>xUtils3</item>
         <item>greenDao</item>
+        <item>ormLite</item>
     </string-array>
 </resources>
