@@ -1,5 +1,6 @@
 package com.mylhyl.dbupgrade.sample;
 
+import android.Manifest;
 import android.content.ContentUris;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -7,6 +8,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+
+import com.mylhyl.acp.Acp;
+import com.mylhyl.acp.AcpListener;
+import com.mylhyl.acp.AcpOptions;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements TypesFragment
         .OnFragmentInteractionListener {
@@ -19,6 +26,19 @@ public class MainActivity extends AppCompatActivity implements TypesFragment
                     .add(android.R.id.content, TypesFragment.newInstance())
                     .commitAllowingStateLoss();
         }
+        AcpOptions acpOptions = new AcpOptions.Builder()
+                .setPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE
+                        , Manifest.permission.READ_EXTERNAL_STORAGE)
+                .build();
+        Acp.getInstance(this).request(acpOptions, new AcpListener() {
+            @Override
+            public void onGranted() {
+            }
+
+            @Override
+            public void onDenied(List<String> permissions) {
+            }
+        });
     }
 
     @Override
