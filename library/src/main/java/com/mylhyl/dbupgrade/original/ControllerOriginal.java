@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import com.mylhyl.dbupgrade.ColumnType;
 import com.mylhyl.dbupgrade.base.AbsController;
+import com.mylhyl.dbupgrade.base.BaseMigration;
 
 import java.util.List;
 
@@ -11,47 +12,29 @@ import java.util.List;
  * Created by hupei on 2017/6/9.
  */
 
-public final class Controller extends AbsController<Table, String, Original.With, Controller> {
+public final class ControllerOriginal extends AbsController<TableOriginal, String, Original.With
+        , ControllerOriginal> {
 
-    public Controller(Original.With with, String tableName, String sqlCreateTable) {
+    public ControllerOriginal(Original.With with, String tableName, String sqlCreateTable) {
         this.mWith = with;
-        this.mTable = new Table(tableName, sqlCreateTable);
+        this.mTable = new TableOriginal(tableName, sqlCreateTable);
     }
 
-    /**
-     * 添加列
-     *
-     * @param columnName 列名
-     * @param fieldType  列类型
-     * @return
-     */
-    public Controller addColumn(String columnName, ColumnType fieldType) {
+    @Override
+    public ControllerOriginal addColumn(String columnName, ColumnType fieldType) {
         //列不存在才添加
-        if (!Migration.columnIsExist(mWith.getSQLiteDatabase(), mTable.tableName, columnName))
+        if (!BaseMigration.columnIsExist(mWith.getSQLiteDatabase(), mTable.tableName, columnName))
             mTable.addColumn(columnName, fieldType);
         return this;
     }
 
-    /**
-     * 删除列
-     *
-     * @param columnName 列名
-     * @return
-     */
-    public Controller removeColumn(String columnName) {
-        //列存在才添加
-        if (Migration.columnIsExist(mWith.getSQLiteDatabase(), mTable.tableName, columnName))
-            mTable.removeColumn(columnName);
-        return this;
-    }
-
     @Override
-    public Controller setUpgradeTable(String tableName) {
+    public ControllerOriginal setUpgradeTable(String tableName) {
         return setUpgradeTable(tableName, "");
     }
 
     @Override
-    public Controller setUpgradeTable(String tableName, String sqlCreateTable) {
+    public ControllerOriginal setUpgradeTable(String tableName, String sqlCreateTable) {
         addUpgrade();
         return mWith.setUpgradeTable(tableName, sqlCreateTable);
     }
@@ -65,7 +48,7 @@ public final class Controller extends AbsController<Table, String, Original.With
     private void setSqlCreateTable() {
         //判断是否有自定义sql
         if (!TextUtils.isEmpty(mTable.sqlCreateTable)) return;
-        String tableSql = Migration.createTableSql(mWith.getSQLiteDatabase(), mTable.tableName);
+        String tableSql = MigrationOriginal.createTableSql(mWith.getSQLiteDatabase(), mTable.tableName);
         //检查是否有删除字段
         List<String> removeColumns = mTable.removeColumns;
         if (removeColumns.isEmpty()) {
@@ -88,5 +71,18 @@ public final class Controller extends AbsController<Table, String, Original.With
             }
         }
         mTable.sqlCreateTable = tableSql;
+    }
+
+    /**
+     * 删除列
+     *
+     * @param columnName 列名
+     * @return
+     */
+    public ControllerOriginal removeColumn(String columnName) {
+        //列存在才添加
+        if (MigrationOriginal.columnIsExist(mWith.getSQLiteDatabase(), mTable.tableName, columnName))
+            mTable.removeColumn(columnName);
+        return this;
     }
 }

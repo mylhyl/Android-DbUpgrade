@@ -25,9 +25,9 @@ public final class Original {
         return mWith;
     }
 
-    public final class With extends AbsWith<Table> {
-        private List<Table> mUpgradeList = new ArrayList<>();
-        private Controller mUpgradeController;
+    public final class With extends AbsWith<TableOriginal> {
+        private List<TableOriginal> mUpgradeList = new ArrayList<>();
+        private ControllerOriginal mUpgradeController;
 
         private With(int mOldVersion, int mNewVersion) {
             super(mOldVersion, mNewVersion);
@@ -39,7 +39,7 @@ public final class Original {
         }
 
         @Override
-        protected void addUpgrade(Table upgradeTable) {
+        protected void addUpgrade(TableOriginal upgradeTable) {
             mUpgradeList.add(upgradeTable);
         }
 
@@ -50,7 +50,7 @@ public final class Original {
 
         @Override
         protected void upgrade() {
-            new Migration().migrate(mSQLiteDatabase, mOldVersion, mUpgradeList);
+            new MigrationOriginal().migrate(mSQLiteDatabase, mOldVersion, mUpgradeList);
         }
 
         /**
@@ -59,7 +59,7 @@ public final class Original {
          * @param tableName 表名
          * @return Controller
          */
-        public Controller setUpgradeTable(String tableName) {
+        public ControllerOriginal setUpgradeTable(String tableName) {
             return setUpgradeTable(tableName, "");
         }
 
@@ -70,8 +70,8 @@ public final class Original {
          * @param sqlCreateTable 创建表的 sql
          * @return Controller
          */
-        public Controller setUpgradeTable(String tableName, String sqlCreateTable) {
-            mUpgradeController = new Controller(this, tableName, sqlCreateTable);
+        public ControllerOriginal setUpgradeTable(String tableName, String sqlCreateTable) {
+            mUpgradeController = new ControllerOriginal(this, tableName, sqlCreateTable);
             return mUpgradeController;
         }
 

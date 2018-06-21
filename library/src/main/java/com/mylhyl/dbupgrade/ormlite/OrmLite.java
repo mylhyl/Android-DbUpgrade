@@ -14,13 +14,13 @@ import java.util.List;
 
 public final class OrmLite {
     private With mWith;
-    private SQLiteDatabase mDatabase;
+    private SQLiteDatabase mSQLiteDatabase;
     private ConnectionSource mConnectionSource;
 
     public OrmLite(int oldVersion, int newVersion, SQLiteDatabase db, ConnectionSource
             connectionSource) {
         this.mWith = new With(oldVersion, newVersion);
-        this.mDatabase = db;
+        this.mSQLiteDatabase = db;
         this.mConnectionSource = connectionSource;
     }
 
@@ -76,8 +76,12 @@ public final class OrmLite {
 
         @Override
         protected void upgrade() {
-            new MigrationOrmLite().migrate(mDatabase, mConnectionSource, mWith.mOldVersion,
+            new MigrationOrmLite().migrate(mSQLiteDatabase, mConnectionSource, mWith.mOldVersion,
                     mUpgradeList);
+        }
+
+        protected SQLiteDatabase getSQLiteDatabase() {
+            return mSQLiteDatabase;
         }
     }
 }

@@ -17,7 +17,7 @@ import java.util.List;
 public final class GreenDao {
     private With mWith;
     private Database mDatabase;
-    private SQLiteDatabase mSqLiteDatabase;
+    private SQLiteDatabase mSQLiteDatabase;
 
 
     public GreenDao(int oldVersion, int newVersion, Database db) {
@@ -27,7 +27,7 @@ public final class GreenDao {
 
     public GreenDao(int oldVersion, int newVersion, SQLiteDatabase db) {
         this.mWith = new With(oldVersion, newVersion);
-        this.mSqLiteDatabase = db;
+        this.mSQLiteDatabase = db;
     }
 
     public GreenDao.With setUpgradeVersion(int upgradeVersion) {
@@ -63,7 +63,7 @@ public final class GreenDao {
             if (mDatabase != null)
                 new MigrationGreenDao().migrate(mDatabase, mOldVersion, mUpgradeList);
             else
-                new MigrationGreenDao().migrate(mSqLiteDatabase, mOldVersion,
+                new MigrationGreenDao().migrate(mSQLiteDatabase, mOldVersion,
                         mUpgradeList);
         }
 
@@ -88,6 +88,10 @@ public final class GreenDao {
                 , String sqlCreateTable) {
             mUpgradeController = new ControllerGreenDao(this, abstractDao, sqlCreateTable);
             return mUpgradeController;
+        }
+
+        protected SQLiteDatabase getSQLiteDatabase() {
+            return mSQLiteDatabase;
         }
     }
 }

@@ -24,8 +24,6 @@ public class OrmLiteFragment extends Fragment {
     private MainActivity mainActivity;
     private TextView textView;
     private int dbVersion = 1;
-    private String dbName = "dbupgradexutils.db";
-    private File dbDir = null;
 
     public OrmLiteFragment() {
     }
@@ -50,7 +48,6 @@ public class OrmLiteFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        dbDir = new File(getActivity().getExternalCacheDir() + "/database");
         textView = (TextView) getView().findViewById(R.id.text);
 
         getView().findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {

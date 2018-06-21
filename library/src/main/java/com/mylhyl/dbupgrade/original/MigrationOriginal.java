@@ -14,9 +14,9 @@ import java.util.Map;
 /**
  * Created by hupei on 2017/6/9.
  */
-public final class Migration extends BaseMigration {
+public final class MigrationOriginal extends BaseMigration {
 
-    public void migrate(SQLiteDatabase db, int oldVersion, List<Table> upgradeList) {
+    public void migrate(SQLiteDatabase db, int oldVersion, List<TableOriginal> upgradeList) {
         SQLiteDatabase database = db;
         setDatabase(db);
         beginTransaction();
@@ -49,10 +49,10 @@ public final class Migration extends BaseMigration {
         }
     }
 
-    private void generateTempTables(List<Table> upgradeList) {
+    private void generateTempTables(List<TableOriginal> upgradeList) {
         int size = upgradeList.size();
         for (int i = 0; i < size; i++) {
-            Table upgrade = upgradeList.get(i);
+            TableOriginal upgrade = upgradeList.get(i);
             String tableName = upgrade.tableName;
             //判断表是否存在
             if (!tableIsExist(false, tableName)) {
@@ -63,18 +63,18 @@ public final class Migration extends BaseMigration {
         }
     }
 
-    private void dropAllTables(SQLiteDatabase db, List<Table> upgradeList) {
+    private void dropAllTables(SQLiteDatabase db, List<TableOriginal> upgradeList) {
         int size = upgradeList.size();
         for (int i = 0; i < size; i++) {
-            Table upgrade = upgradeList.get(i);
+            TableOriginal upgrade = upgradeList.get(i);
             db.execSQL("DROP TABLE IF EXISTS \"" + upgrade.tableName + "\"");
         }
     }
 
-    private void createAllTables(SQLiteDatabase db, List<Table> upgradeList) {
+    private void createAllTables(SQLiteDatabase db, List<TableOriginal> upgradeList) {
         int size = upgradeList.size();
         for (int i = 0; i < size; i++) {
-            Table upgrade = upgradeList.get(i);
+            TableOriginal upgrade = upgradeList.get(i);
             String tableName = upgrade.tableName;
             createTable(db, tableName, upgrade.sqlCreateTable);
             //加入新列
@@ -104,20 +104,6 @@ public final class Migration extends BaseMigration {
             db.execSQL("ALTER TABLE " + tableName + " ADD " + columnName + " " + columnType);
     }
 
-    static boolean columnIsExist(SQLiteDatabase db, String tableName, String fieldName) {
-        boolean result = false;
-        Cursor cursor = db.rawQuery("SELECT sql FROM sqlite_master WHERE tbl_name='" + tableName +
-                "' AND type='table'", null);
-        if (cursor != null) {
-            if (cursor.moveToNext()) {
-                String createSql = cursor.getString(0);
-                if (createSql.indexOf(fieldName) > 0) result = true;
-            }
-            cursor.close();
-        }
-        return result;
-    }
-
     static String createTableSql(SQLiteDatabase db, String tableName) {
         String createSql = "";
         Cursor cursor = db.rawQuery("SELECT sql FROM sqlite_master WHERE tbl_name=?",
@@ -129,10 +115,10 @@ public final class Migration extends BaseMigration {
         return createSql;
     }
 
-    private void restoreData(List<Table> upgradeList) {
+    private void restoreData(List<TableOriginal> upgradeList) {
         int size = upgradeList.size();
         for (int i = 0; i < size; i++) {
-            Table upgrade = upgradeList.get(i);
+            TableOriginal upgrade = upgradeList.get(i);
             String tableName = upgrade.tableName;
             String tempTableName = tableName.concat("_TEMP");
             if (!tableIsExist(true, tempTableName)) {

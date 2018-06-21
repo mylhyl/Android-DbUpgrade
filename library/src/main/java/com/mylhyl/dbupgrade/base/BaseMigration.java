@@ -31,6 +31,20 @@ public class BaseMigration {
     private SQLiteDatabase mDatabase;
     private EncryptedDatabase mEncryptedDatabase;
 
+    public static boolean columnIsExist(SQLiteDatabase db, String tableName, String fieldName) {
+        boolean result = false;
+        Cursor cursor = db.rawQuery("SELECT sql FROM sqlite_master WHERE tbl_name='" + tableName +
+                "' AND type='table'", null);
+        if (cursor != null) {
+            if (cursor.moveToNext()) {
+                String createSql = cursor.getString(0);
+                if (createSql.indexOf(fieldName) > 0) result = true;
+            }
+            cursor.close();
+        }
+        return result;
+    }
+
     protected void setEncryptedDatabase(EncryptedDatabase encryptedDatabase) {
         this.mEncryptedDatabase = encryptedDatabase;
     }

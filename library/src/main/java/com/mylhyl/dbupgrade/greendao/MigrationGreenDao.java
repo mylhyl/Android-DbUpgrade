@@ -30,10 +30,15 @@ final class MigrationGreenDao extends BaseMigration {
             setDatabase(((StandardDatabase) database).getSQLiteDatabase());
         else if (database instanceof EncryptedDatabase)
             setEncryptedDatabase((EncryptedDatabase) database);
+
+        printLog("【The Old Database Version】" + oldVersion);
+
+        migrate(database, upgradeList);
+    }
+
+    private void migrate(Database database, List<TableGreenDao> upgradeList) {
         beginTransaction();
         try {
-            printLog("【The Old Database Version】" + oldVersion);
-
             printLog("【Generate temp table】start");
             generateTempTables(database, upgradeList);
             printLog("【Generate temp table】complete");

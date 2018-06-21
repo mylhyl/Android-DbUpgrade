@@ -1,5 +1,7 @@
 package com.mylhyl.dbupgrade.base;
 
+import com.mylhyl.dbupgrade.ColumnType;
+
 /**
  * Created by hupei on 2017/6/16.
  */
@@ -7,6 +9,15 @@ package com.mylhyl.dbupgrade.base;
 public abstract class AbsController<Table extends BaseTable, Name, With extends AbsWith, Controller> {
     protected With mWith;
     protected Table mTable;
+
+    /**
+     * 添加列
+     *
+     * @param columnName 列名
+     * @param fieldType  列类型
+     * @return
+     */
+    public abstract Controller addColumn(String columnName, ColumnType fieldType);
 
     /**
      * 表配置结束，并配置另一个表
