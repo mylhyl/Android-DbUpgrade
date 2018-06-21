@@ -3,8 +3,8 @@ package com.mylhyl.dbupgrade.original;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.mylhyl.dbupgrade.base.BaseMigration;
 import com.mylhyl.dbupgrade.ColumnType;
+import com.mylhyl.dbupgrade.base.BaseMigration;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -16,12 +16,24 @@ import java.util.Map;
  */
 public final class MigrationOriginal extends BaseMigration {
 
+    static String createTableSql(SQLiteDatabase db, String tableName) {
+        String createSql = "";
+        Cursor cursor = db.rawQuery("SELECT sql FROM sqlite_master WHERE tbl_name=?",
+                new String[]{tableName});
+        if (cursor != null) {
+            if (cursor.moveToNext()) createSql = cursor.getString(0);
+            cursor.close();
+        }
+        return createSql;
+    }
+
     public void migrate(SQLiteDatabase db, int oldVersion, List<TableOriginal> upgradeList) {
         SQLiteDatabase database = db;
         setDatabase(db);
+        printLog("【旧数据库版本】>>>" + oldVersion);
+
         beginTransaction();
         try {
-            printLog("【旧数据库版本】>>>" + oldVersion);
 
             //step:1
             printLog("【创建临时表】>>>开始");
@@ -50,10 +62,11 @@ public final class MigrationOriginal extends BaseMigration {
     }
 
     private void generateTempTables(List<TableOriginal> upgradeList) {
-        int size = upgradeList.size();
-        for (int i = 0; i < size; i++) {
-            TableOriginal upgrade = upgradeList.get(i);
-            String tableName = upgrade.tableName;
+        for (TableOriginal upgradeTable : upgradeList) {
+            if (!upgradeTable.migration) {
+                continue;
+            }
+            String tableName = upgradeTable.tableName;
             //判断表是否存在
             if (!tableIsExist(false, tableName)) {
                 printLog("【旧表不存在】" + tableName);
@@ -64,29 +77,43 @@ public final class MigrationOriginal extends BaseMigration {
     }
 
     private void dropAllTables(SQLiteDatabase db, List<TableOriginal> upgradeList) {
-        int size = upgradeList.size();
-        for (int i = 0; i < size; i++) {
-            TableOriginal upgrade = upgradeList.get(i);
-            db.execSQL("DROP TABLE IF EXISTS \"" + upgrade.tableName + "\"");
+        for (TableOriginal upgradeTable : upgradeList) {
+            if (!upgradeTable.migration) {
+                continue;
+            }
+            db.execSQL("DROP TABLE IF EXISTS \"" + upgradeTable.tableName + "\"");
         }
     }
 
     private void createAllTables(SQLiteDatabase db, List<TableOriginal> upgradeList) {
-        int size = upgradeList.size();
-        for (int i = 0; i < size; i++) {
-            TableOriginal upgrade = upgradeList.get(i);
-            String tableName = upgrade.tableName;
-            createTable(db, tableName, upgrade.sqlCreateTable);
+        for (TableOriginal upgradeTable : upgradeList) {
+            String tableName = upgradeTable.tableName;
+            createTable(db, tableName, upgradeTable.sqlCreateTable);
             //加入新列
-            LinkedHashMap<String, ColumnType> addColumnMap = upgrade.addColumns;
+            LinkedHashMap<String, ColumnType> addColumnMap = upgradeTable.addColumns;
             if (addColumnMap.isEmpty()) continue;
             Iterator<Map.Entry<String, ColumnType>> iterator = addColumnMap.entrySet().iterator();
             while (iterator.hasNext()) {
                 Map.Entry<String, ColumnType> entry = iterator.next();
-                addColumn(db, upgrade.tableName, entry.getKey(), entry.getValue().toString());
+                addColumn(upgradeTable.tableName, entry.getKey(), entry.getValue().toString());
             }
 //            List<String> columns = getColumns(tableName);
 //            printLog("【表】" + tableName + "\n ---列-->" + getColumnsStr(columns));
+        }
+    }
+
+    private void restoreData(List<TableOriginal> upgradeList) {
+        for (TableOriginal upgradeTable : upgradeList) {
+            if (!upgradeTable.migration) {
+                continue;
+            }
+            String tableName = upgradeTable.tableName;
+            String tempTableName = tableName.concat("_TEMP");
+            if (!tableIsExist(true, tempTableName)) {
+                printLog("【临时表不存在】" + tempTableName);
+                continue;
+            }
+            restoreData(tableName, tempTableName);
         }
     }
 
@@ -95,37 +122,6 @@ public final class MigrationOriginal extends BaseMigration {
         if (!tableIsExist(false, tableName)) {
             db.execSQL(sql);
             printLog("【创建新表成功】\n" + sql);
-        }
-    }
-
-    private void addColumn(SQLiteDatabase db, String tableName, String columnName, String
-            columnType) {
-        if (!columnIsExist(db, tableName, columnName))
-            db.execSQL("ALTER TABLE " + tableName + " ADD " + columnName + " " + columnType);
-    }
-
-    static String createTableSql(SQLiteDatabase db, String tableName) {
-        String createSql = "";
-        Cursor cursor = db.rawQuery("SELECT sql FROM sqlite_master WHERE tbl_name=?",
-                new String[]{tableName});
-        if (cursor != null) {
-            if (cursor.moveToNext()) createSql = cursor.getString(0);
-            cursor.close();
-        }
-        return createSql;
-    }
-
-    private void restoreData(List<TableOriginal> upgradeList) {
-        int size = upgradeList.size();
-        for (int i = 0; i < size; i++) {
-            TableOriginal upgrade = upgradeList.get(i);
-            String tableName = upgrade.tableName;
-            String tempTableName = tableName.concat("_TEMP");
-            if (!tableIsExist(true, tempTableName)) {
-                printLog("【临时表不存在】" + tempTableName);
-                continue;
-            }
-            restoreData(tableName, tempTableName);
         }
     }
 }

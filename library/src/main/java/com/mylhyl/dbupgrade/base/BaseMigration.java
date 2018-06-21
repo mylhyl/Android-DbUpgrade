@@ -31,10 +31,21 @@ public class BaseMigration {
     private SQLiteDatabase mDatabase;
     private EncryptedDatabase mEncryptedDatabase;
 
-    public static boolean columnIsExist(SQLiteDatabase db, String tableName, String fieldName) {
+    protected void addColumn(String tableName, String columnName, String
+            columnType) {
+        if (!columnIsExist(tableName, columnName)) {
+            String sql = "ALTER TABLE " + tableName + " ADD " + columnName + " " + columnType;
+            if (mDatabase != null) mDatabase.execSQL(sql);
+            else mEncryptedDatabase.execSQL(sql);
+        }
+    }
+
+    private boolean columnIsExist(String tableName, String fieldName) {
+        String sql = "SELECT sql FROM sqlite_master WHERE tbl_name='" + tableName +
+                "' AND type='table'";
         boolean result = false;
-        Cursor cursor = db.rawQuery("SELECT sql FROM sqlite_master WHERE tbl_name='" + tableName +
-                "' AND type='table'", null);
+        Cursor cursor = mDatabase != null ? mDatabase.rawQuery(sql, null)
+                : mEncryptedDatabase.rawQuery(sql, null);
         if (cursor != null) {
             if (cursor.moveToNext()) {
                 String createSql = cursor.getString(0);

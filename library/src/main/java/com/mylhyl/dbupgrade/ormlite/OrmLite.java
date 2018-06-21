@@ -79,9 +79,5 @@ public final class OrmLite {
             new MigrationOrmLite().migrate(mSQLiteDatabase, mConnectionSource, mWith.mOldVersion,
                     mUpgradeList);
         }
-
-        protected SQLiteDatabase getSQLiteDatabase() {
-            return mSQLiteDatabase;
-        }
     }
 }

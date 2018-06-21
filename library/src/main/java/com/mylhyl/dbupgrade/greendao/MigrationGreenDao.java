@@ -3,6 +3,7 @@ package com.mylhyl.dbupgrade.greendao;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
+import com.mylhyl.dbupgrade.ColumnType;
 import com.mylhyl.dbupgrade.base.BaseMigration;
 
 import org.greenrobot.greendao.AbstractDao;
@@ -13,7 +14,10 @@ import org.greenrobot.greendao.internal.DaoConfig;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by hupei on 2017/6/15.
@@ -60,6 +64,9 @@ final class MigrationGreenDao extends BaseMigration {
 
     private void generateTempTables(Database db, List<TableGreenDao> upgradeList) {
         for (TableGreenDao upgradeTable : upgradeList) {
+            if (!upgradeTable.migration) {
+                continue;
+            }
             Class<? extends AbstractDao<?, ?>> abstractDao = upgradeTable.abstractDao;
             DaoConfig daoConfig = new DaoConfig(db, abstractDao);
             String tableName = daoConfig.tablename;
@@ -68,12 +75,16 @@ final class MigrationGreenDao extends BaseMigration {
                 continue;
             }
             generateTempTables(tableName);
+
         }
     }
 
 
     private void dropAllTables(Database db, List<TableGreenDao> upgradeList) {
         for (TableGreenDao upgradeTable : upgradeList) {
+            if (!upgradeTable.migration) {
+                continue;
+            }
             if (TextUtils.isEmpty(upgradeTable.sqlCreateTable)) {
                 reflectMethod(db, "dropTable", true, upgradeTable);
             } else {
@@ -89,6 +100,22 @@ final class MigrationGreenDao extends BaseMigration {
 
     private void createAllTables(Database db, List<TableGreenDao> upgradeList) {
         for (TableGreenDao upgradeTable : upgradeList) {
+            if (!upgradeTable.migration) {
+                Class<? extends AbstractDao<?, ?>> abstractDao = upgradeTable.abstractDao;
+                DaoConfig daoConfig = new DaoConfig(db, abstractDao);
+                String tableName = daoConfig.tablename;
+                if (tableIsExist(false, tableName)) {
+                    //加入新列
+                    LinkedHashMap<String, ColumnType> addColumnMap = upgradeTable.addColumns;
+                    if (addColumnMap.isEmpty()) continue;
+                    Iterator<Map.Entry<String, ColumnType>> iterator = addColumnMap.entrySet().iterator();
+                    while (iterator.hasNext()) {
+                        Map.Entry<String, ColumnType> entry = iterator.next();
+                        addColumn(tableName, entry.getKey(), entry.getValue().toString());
+                    }
+                }
+                continue;
+            }
             if (TextUtils.isEmpty(upgradeTable.sqlCreateTable))
                 reflectMethod(db, "createTable", false, upgradeTable);
             else db.execSQL(upgradeTable.sqlCreateTable);
@@ -98,6 +125,9 @@ final class MigrationGreenDao extends BaseMigration {
 
     private void restoreData(Database db, List<TableGreenDao> upgradeList) {
         for (TableGreenDao upgradeTable : upgradeList) {
+            if (!upgradeTable.migration) {
+                continue;
+            }
             Class<? extends AbstractDao<?, ?>> abstractDao = upgradeTable.abstractDao;
             DaoConfig daoConfig = new DaoConfig(db, abstractDao);
             String tableName = daoConfig.tablename;

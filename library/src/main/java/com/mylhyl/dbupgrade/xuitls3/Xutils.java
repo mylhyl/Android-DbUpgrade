@@ -74,9 +74,5 @@ public final class Xutils {
         protected void upgrade() {
             new MigrationXutils().migrate(mDbManager, mWith.mOldVersion, mUpgradeList);
         }
-
-        protected DbManager getDbManager() {
-            return mDbManager;
-        }
     }
 }

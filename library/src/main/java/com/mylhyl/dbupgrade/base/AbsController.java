@@ -11,11 +11,20 @@ public abstract class AbsController<Table extends BaseTable, Name, With extends 
     protected Table mTable;
 
     /**
+     * 是否走升级策略(1建临时，2删旧表，3建新表，4还原数据)
+     * 如果只是添加字段，建议 false
+     *
+     * @param migration true 是 false 否
+     * @return Controller
+     */
+    public abstract Controller setMigration(boolean migration);
+
+    /**
      * 添加列
      *
      * @param columnName 列名
      * @param fieldType  列类型
-     * @return
+     * @return Controller
      */
     public abstract Controller addColumn(String columnName, ColumnType fieldType);
 

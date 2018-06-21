@@ -89,9 +89,5 @@ public final class GreenDao {
             mUpgradeController = new ControllerGreenDao(this, abstractDao, sqlCreateTable);
             return mUpgradeController;
         }
-
-        protected SQLiteDatabase getSQLiteDatabase() {
-            return mSQLiteDatabase;
-        }
     }
 }

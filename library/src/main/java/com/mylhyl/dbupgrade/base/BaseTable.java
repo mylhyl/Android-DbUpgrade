@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 public class BaseTable {
     public String sqlCreateTable;
     public LinkedHashMap<String, ColumnType> addColumns = new LinkedHashMap<>();
+    public boolean migration = true;
 
     public void addColumn(String columnName, ColumnType columnType) {
         addColumns.put(columnName, columnType);

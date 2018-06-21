@@ -4,7 +4,6 @@ import android.text.TextUtils;
 
 import com.mylhyl.dbupgrade.ColumnType;
 import com.mylhyl.dbupgrade.base.AbsController;
-import com.mylhyl.dbupgrade.base.BaseMigration;
 
 import java.util.List;
 
@@ -21,10 +20,14 @@ public final class ControllerOriginal extends AbsController<TableOriginal, Strin
     }
 
     @Override
+    public ControllerOriginal setMigration(boolean migration) {
+        this.mTable.migration = migration;
+        return this;
+    }
+
+    @Override
     public ControllerOriginal addColumn(String columnName, ColumnType fieldType) {
-        //列不存在才添加
-        if (!BaseMigration.columnIsExist(mWith.getSQLiteDatabase(), mTable.tableName, columnName))
-            mTable.addColumn(columnName, fieldType);
+        mTable.addColumn(columnName, fieldType);
         return this;
     }
 
@@ -80,9 +83,7 @@ public final class ControllerOriginal extends AbsController<TableOriginal, Strin
      * @return
      */
     public ControllerOriginal removeColumn(String columnName) {
-        //列存在才添加
-        if (MigrationOriginal.columnIsExist(mWith.getSQLiteDatabase(), mTable.tableName, columnName))
-            mTable.removeColumn(columnName);
+        mTable.removeColumn(columnName);
         return this;
     }
 }
