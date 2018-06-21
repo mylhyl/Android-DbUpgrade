@@ -2,7 +2,6 @@ package com.mylhyl.dbupgrade.sample;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
@@ -51,8 +50,7 @@ public class OrmLiteFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        dbDir = new File(Environment.getExternalStorageDirectory() + "/dbupgrade/" +
-                getActivity().getPackageName() + "/database");
+        dbDir = new File(getActivity().getExternalCacheDir() + "/database");
         textView = (TextView) getView().findViewById(R.id.text);
 
         getView().findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {

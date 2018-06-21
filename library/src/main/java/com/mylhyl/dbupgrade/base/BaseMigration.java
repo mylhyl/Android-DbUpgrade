@@ -12,7 +12,10 @@ import org.greenrobot.greendao.database.EncryptedDatabase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -109,9 +112,17 @@ public class BaseMigration {
         ArrayList<String> properties = new ArrayList<>(tempColumns.size());
         //取出新表列
         String[] newColumns = getNewColumns(tableName);
+        //不为空的字段<字段名，数据类型>
+        HashMap<String, String> propertiesNotNull = new HashMap<>();
         for (String columnName : newColumns) {
+            //旧表中有的才添加，没有的则是新加的，新加的要判断是不是不能为空
             if (tempColumns.contains(columnName)) {
                 properties.add("`" + columnName + "`");
+            } else {
+                HashMap<String, String> columnInfo = getColumnInfo(tableName, columnName);
+                if (!columnInfo.isEmpty()) {
+                    propertiesNotNull.putAll(columnInfo);
+                }
             }
         }
 
@@ -121,8 +132,28 @@ public class BaseMigration {
             StringBuilder insertTableStringBuilder = new StringBuilder();
             insertTableStringBuilder.append("REPLACE INTO ").append(tableName).append(" (");
             insertTableStringBuilder.append(columnSQL);
+            //处理新加且不能为空的字段
+            if (!propertiesNotNull.isEmpty()) {
+                Iterator<Map.Entry<String, String>> it = propertiesNotNull.entrySet().iterator();
+                while (it.hasNext()) {
+                    Map.Entry<String, String> entry = it.next();
+                    insertTableStringBuilder.append(",'").append(entry.getKey()).append("'");
+                }
+            }
             insertTableStringBuilder.append(") SELECT ");
             insertTableStringBuilder.append(columnSQL);
+            //处理新加且不能为空的字段
+            if (!propertiesNotNull.isEmpty()) {
+                Iterator<Map.Entry<String, String>> it = propertiesNotNull.entrySet().iterator();
+                while (it.hasNext()) {
+                    Map.Entry<String, String> entry = it.next();
+                    if (entry.getValue().equalsIgnoreCase("TEXT")) {
+                        insertTableStringBuilder.append(",'").append("'");
+                    } else {
+                        insertTableStringBuilder.append(",").append(0);
+                    }
+                }
+            }
             insertTableStringBuilder.append(" FROM ").append(tempTableName).append(";");
 
             if (mDatabase != null) mDatabase.execSQL(insertTableStringBuilder.toString());
@@ -183,5 +214,36 @@ public class BaseMigration {
             if (cursor != null) cursor.close();
         }
         return columnNames;
+    }
+
+    private HashMap<String, String> getColumnInfo(String tableName, String columnName) {
+        HashMap<String, String> result = new HashMap<>();
+        String sql = "PRAGMA table_info(" + tableName + ")";
+        Cursor cursor = null;
+        try {
+            if (mDatabase != null) cursor = mDatabase.rawQuery(sql, null);
+            else cursor = mEncryptedDatabase.rawQuery(sql, null);
+
+            if (cursor != null) {
+                int columnIndex = cursor.getColumnIndex("name");
+                if (columnIndex == -1) return result;
+
+                for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+                    String name = cursor.getString(columnIndex);
+                    if (name.equalsIgnoreCase(columnName)) {
+                        int notnull = cursor.getInt(cursor.getColumnIndex("notnull"));
+                        if (notnull == 1) {
+                            String dataType = cursor.getString(cursor.getColumnIndex("type"));
+                            result.put(columnName, dataType);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null) cursor.close();
+        }
+        return result;
     }
 }

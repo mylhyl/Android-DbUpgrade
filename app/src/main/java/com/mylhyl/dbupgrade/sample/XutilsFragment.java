@@ -58,8 +58,7 @@ public class XutilsFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        dbDir = new File(Environment.getExternalStorageDirectory() + "/dbupgrade/" +
-                getActivity().getPackageName() + "/database");
+        dbDir = new File(getActivity().getExternalCacheDir() + "/database");
         textView = (TextView) getView().findViewById(R.id.text);
 
         getView().findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
