@@ -12,7 +12,7 @@ public abstract class AbsController<Table extends BaseTable, Name, With extends 
 
     /**
      * 是否走升级策略(1建临时，2删旧表，3建新表，4还原数据)
-     * 如果只是添加字段，建议 false
+     * 建议表只有添加字段设置 false，但 addColumn 为空也会走升级策略
      *
      * @param migration true 是 false 否
      * @return Controller
@@ -21,6 +21,7 @@ public abstract class AbsController<Table extends BaseTable, Name, With extends 
 
     /**
      * 添加列
+     * 当调用此方法时 内部会 setMigration(false)
      *
      * @param columnName 列名
      * @param fieldType  列类型

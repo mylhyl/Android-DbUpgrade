@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mylhyl.dbupgrade.ColumnType;
 import com.mylhyl.dbupgrade.DbUpgrade;
 import com.mylhyl.dbupgrade.greendao.GreenDao;
 import com.mylhyl.dbupgrade.sample.greendao.DaoMaster;
@@ -194,7 +195,10 @@ public class GreenDaoFragment extends Fragment {
             GreenDao greenDao = dbUpgrade.withGreenDao(db);
             greenDao.setUpgradeVersion(1)
                     .setUpgradeTable(DeviceEntityDao.class)
+                    .setMigration(false)
                     .setUpgradeTable(UserEntityDao.class)
+//                    .addColumn(DeviceEntityDao.Properties.Content.columnName, ColumnType.TEXT)
+//                    .addColumn(DeviceEntityDao.Properties.Info.columnName, ColumnType.INTEGER)
                     //每个版本都必须 upgrade()一次
                     .upgrade();
 

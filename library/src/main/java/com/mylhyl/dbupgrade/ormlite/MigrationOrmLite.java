@@ -57,7 +57,7 @@ final class MigrationOrmLite extends BaseMigration {
 
     private void generateTempTables(List<TableOrmLite> upgradeList) {
         for (TableOrmLite upgradeTable : upgradeList) {
-            if (!upgradeTable.migration) {
+            if (!upgradeTable.migration && !upgradeTable.addColumns.isEmpty()) {
                 continue;
             }
             String tableName = DatabaseTableConfig.extractTableName(upgradeTable.entityType);
@@ -73,7 +73,7 @@ final class MigrationOrmLite extends BaseMigration {
     private void dropAllTables(ConnectionSource connectionSource, List<TableOrmLite> upgradeList)
             throws SQLException {
         for (TableOrmLite upgradeTable : upgradeList) {
-            if (!upgradeTable.migration) {
+            if (!upgradeTable.migration && !upgradeTable.addColumns.isEmpty()) {
                 continue;
             }
             TableUtils.dropTable(connectionSource, upgradeTable.entityType, true);
@@ -83,12 +83,11 @@ final class MigrationOrmLite extends BaseMigration {
     private void createAllTables(SQLiteDatabase db, ConnectionSource connectionSource,
                                  List<TableOrmLite> upgradeList) throws SQLException {
         for (TableOrmLite upgradeTable : upgradeList) {
-            if (!upgradeTable.migration) {
+            if (!upgradeTable.migration && !upgradeTable.addColumns.isEmpty()) {
                 String tableName = DatabaseTableConfig.extractTableName(upgradeTable.entityType);
                 if (tableIsExist(false, tableName)) {
                     //加入新列
                     LinkedHashMap<String, ColumnType> addColumnMap = upgradeTable.addColumns;
-                    if (addColumnMap.isEmpty()) continue;
                     Iterator<Map.Entry<String, ColumnType>> iterator = addColumnMap.entrySet().iterator();
                     while (iterator.hasNext()) {
                         Map.Entry<String, ColumnType> entry = iterator.next();
@@ -108,7 +107,7 @@ final class MigrationOrmLite extends BaseMigration {
 
     private void restoreData(List<TableOrmLite> upgradeList) {
         for (TableOrmLite upgradeTable : upgradeList) {
-            if (!upgradeTable.migration) {
+            if (!upgradeTable.migration && !upgradeTable.addColumns.isEmpty()) {
                 continue;
             }
             String tableName = DatabaseTableConfig.extractTableName(upgradeTable.entityType);

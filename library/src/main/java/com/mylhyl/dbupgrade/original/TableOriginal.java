@@ -19,6 +19,7 @@ public final class TableOriginal extends BaseTable {
     }
 
     public void removeColumn(String columnName) {
+        migration = true;
         removeColumns.add(columnName);
     }
 }

@@ -14,7 +14,6 @@ public class DeviceEntity {
 
     private String deviceNum = "deviceNum";
 
-    //版本3添加
     private String unit = "unit";
 
     @Generated(hash = 1659403700)

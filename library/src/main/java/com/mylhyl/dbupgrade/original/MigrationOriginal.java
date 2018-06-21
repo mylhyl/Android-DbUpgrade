@@ -63,7 +63,7 @@ public final class MigrationOriginal extends BaseMigration {
 
     private void generateTempTables(List<TableOriginal> upgradeList) {
         for (TableOriginal upgradeTable : upgradeList) {
-            if (!upgradeTable.migration) {
+            if (!upgradeTable.migration && !upgradeTable.addColumns.isEmpty()) {
                 continue;
             }
             String tableName = upgradeTable.tableName;
@@ -78,7 +78,7 @@ public final class MigrationOriginal extends BaseMigration {
 
     private void dropAllTables(SQLiteDatabase db, List<TableOriginal> upgradeList) {
         for (TableOriginal upgradeTable : upgradeList) {
-            if (!upgradeTable.migration) {
+            if (!upgradeTable.migration && !upgradeTable.addColumns.isEmpty()) {
                 continue;
             }
             db.execSQL("DROP TABLE IF EXISTS \"" + upgradeTable.tableName + "\"");
@@ -104,7 +104,7 @@ public final class MigrationOriginal extends BaseMigration {
 
     private void restoreData(List<TableOriginal> upgradeList) {
         for (TableOriginal upgradeTable : upgradeList) {
-            if (!upgradeTable.migration) {
+            if (!upgradeTable.migration && !upgradeTable.addColumns.isEmpty()) {
                 continue;
             }
             String tableName = upgradeTable.tableName;

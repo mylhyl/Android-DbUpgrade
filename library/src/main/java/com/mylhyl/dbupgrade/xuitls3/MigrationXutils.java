@@ -58,7 +58,7 @@ final class MigrationXutils extends BaseMigration {
     private void generateTempTables(DbManager db, List<TableXutils> upgradeList)
             throws DbException {
         for (TableXutils upgradeTable : upgradeList) {
-            if (!upgradeTable.migration) {
+            if (!upgradeTable.migration && !upgradeTable.addColumns.isEmpty()) {
                 continue;
             }
             TableEntity table = db.getTable(upgradeTable.entityType);
@@ -75,7 +75,7 @@ final class MigrationXutils extends BaseMigration {
     private void dropAllTables(DbManager db, List<TableXutils> upgradeList) throws
             DbException {
         for (TableXutils upgradeTable : upgradeList) {
-            if (!upgradeTable.migration) {
+            if (!upgradeTable.migration && !upgradeTable.addColumns.isEmpty()) {
                 continue;
             }
             db.dropTable(upgradeTable.entityType);
@@ -85,13 +85,12 @@ final class MigrationXutils extends BaseMigration {
     private void createAllTables(DbManager db, List<TableXutils> upgradeList)
             throws DbException {
         for (TableXutils upgradeTable : upgradeList) {
-            if (!upgradeTable.migration) {
+            if (!upgradeTable.migration && !upgradeTable.addColumns.isEmpty()) {
                 TableEntity table = db.getTable(upgradeTable.entityType);
                 String tableName = table.getName();
                 if (tableIsExist(false, tableName)) {
                     //加入新列
                     LinkedHashMap<String, ColumnType> addColumnMap = upgradeTable.addColumns;
-                    if (addColumnMap.isEmpty()) continue;
                     Iterator<Map.Entry<String, ColumnType>> iterator = addColumnMap.entrySet().iterator();
                     while (iterator.hasNext()) {
                         Map.Entry<String, ColumnType> entry = iterator.next();
@@ -112,7 +111,7 @@ final class MigrationXutils extends BaseMigration {
     private void restoreData(DbManager db, List<TableXutils> upgradeList)
             throws DbException {
         for (TableXutils upgradeTable : upgradeList) {
-            if (!upgradeTable.migration) {
+            if (!upgradeTable.migration && !upgradeTable.addColumns.isEmpty()) {
                 continue;
             }
             TableEntity table = db.getTable(upgradeTable.entityType);

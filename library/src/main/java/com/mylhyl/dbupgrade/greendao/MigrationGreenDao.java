@@ -64,7 +64,7 @@ final class MigrationGreenDao extends BaseMigration {
 
     private void generateTempTables(Database db, List<TableGreenDao> upgradeList) {
         for (TableGreenDao upgradeTable : upgradeList) {
-            if (!upgradeTable.migration) {
+            if (!upgradeTable.migration && !upgradeTable.addColumns.isEmpty()) {
                 continue;
             }
             Class<? extends AbstractDao<?, ?>> abstractDao = upgradeTable.abstractDao;
@@ -82,7 +82,7 @@ final class MigrationGreenDao extends BaseMigration {
 
     private void dropAllTables(Database db, List<TableGreenDao> upgradeList) {
         for (TableGreenDao upgradeTable : upgradeList) {
-            if (!upgradeTable.migration) {
+            if (!upgradeTable.migration && !upgradeTable.addColumns.isEmpty()) {
                 continue;
             }
             if (TextUtils.isEmpty(upgradeTable.sqlCreateTable)) {
@@ -100,14 +100,13 @@ final class MigrationGreenDao extends BaseMigration {
 
     private void createAllTables(Database db, List<TableGreenDao> upgradeList) {
         for (TableGreenDao upgradeTable : upgradeList) {
-            if (!upgradeTable.migration) {
+            if (!upgradeTable.migration && !upgradeTable.addColumns.isEmpty()) {
                 Class<? extends AbstractDao<?, ?>> abstractDao = upgradeTable.abstractDao;
                 DaoConfig daoConfig = new DaoConfig(db, abstractDao);
                 String tableName = daoConfig.tablename;
                 if (tableIsExist(false, tableName)) {
                     //加入新列
                     LinkedHashMap<String, ColumnType> addColumnMap = upgradeTable.addColumns;
-                    if (addColumnMap.isEmpty()) continue;
                     Iterator<Map.Entry<String, ColumnType>> iterator = addColumnMap.entrySet().iterator();
                     while (iterator.hasNext()) {
                         Map.Entry<String, ColumnType> entry = iterator.next();
@@ -125,7 +124,7 @@ final class MigrationGreenDao extends BaseMigration {
 
     private void restoreData(Database db, List<TableGreenDao> upgradeList) {
         for (TableGreenDao upgradeTable : upgradeList) {
-            if (!upgradeTable.migration) {
+            if (!upgradeTable.migration && !upgradeTable.addColumns.isEmpty()) {
                 continue;
             }
             Class<? extends AbstractDao<?, ?>> abstractDao = upgradeTable.abstractDao;

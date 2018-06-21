@@ -13,6 +13,7 @@ public class BaseTable {
     public boolean migration = true;
 
     public void addColumn(String columnName, ColumnType columnType) {
+        migration = false;
         addColumns.put(columnName, columnType);
     }
 }

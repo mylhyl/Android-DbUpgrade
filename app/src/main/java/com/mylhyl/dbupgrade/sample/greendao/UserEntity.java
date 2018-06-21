@@ -1,9 +1,9 @@
 package com.mylhyl.dbupgrade.sample.greendao;
 
 import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Property;
+import org.greenrobot.greendao.annotation.Generated;
 
 /**
  * Created by hupei on 2017/6/15.
@@ -20,9 +20,7 @@ public class UserEntity {
     private int age = 18;
 
     private String sex = "男";
-    //版本2
     private long tel;
-    //版本3
     private String address = "中国广东珠海";
     @Generated(hash = 1448576916)
     public UserEntity(Long id, String name, int age, String sex, long tel,
@@ -73,4 +71,5 @@ public class UserEntity {
     public void setAddress(String address) {
         this.address = address;
     }
+
 }
