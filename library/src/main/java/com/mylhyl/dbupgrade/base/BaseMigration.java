@@ -20,11 +20,10 @@ import java.util.List;
  */
 
 public class BaseMigration {
-    public static boolean DEBUG = BuildConfig.DEBUG;
     private static final String TAG = "DbUpgrade";
     private static final String SQLITE_MASTER = "sqlite_master";
     private static final String SQLITE_TEMP_MASTER = "sqlite_temp_master";
-
+    public static boolean DEBUG = BuildConfig.DEBUG;
     private SQLiteDatabase mDatabase;
     private EncryptedDatabase mEncryptedDatabase;
 
@@ -77,25 +76,8 @@ public class BaseMigration {
 
     }
 
-    List<String> getColumns(String tableName) {
-        List<String> columns = new ArrayList<>();
-        String sql = "SELECT * FROM " + tableName + " limit 1";
-        Cursor cursor = null;
-        try {
-            if (mDatabase != null) cursor = mDatabase.rawQuery(sql, null);
-            else cursor = mEncryptedDatabase.rawQuery(sql, null);
-
-            if (cursor != null) {
-                columns = new ArrayList<>(Arrays.asList(cursor.getColumnNames()));
-            }
-        } catch (Exception e) {
-            Log.v(tableName, e.getMessage(), e);
-            e.printStackTrace();
-        } finally {
-            if (cursor != null)
-                cursor.close();
-        }
-        return columns;
+    protected void printLog(String info) {
+        if (DEBUG) Log.d(TAG, info);
     }
 
     protected boolean tableIsExist(boolean isTemp, String tableName) {
@@ -128,14 +110,16 @@ public class BaseMigration {
         //取出新表列
         String[] newColumns = getNewColumns(tableName);
         for (String columnName : newColumns) {
-            if (tempColumns.contains(columnName)) properties.add(columnName);
+            if (tempColumns.contains(columnName)) {
+                properties.add("`" + columnName + "`");
+            }
         }
 
         if (properties.size() > 0) {
             final String columnSQL = TextUtils.join(",", properties);
             //还原数据
             StringBuilder insertTableStringBuilder = new StringBuilder();
-            insertTableStringBuilder.append("INSERT INTO ").append(tableName).append(" (");
+            insertTableStringBuilder.append("REPLACE INTO ").append(tableName).append(" (");
             insertTableStringBuilder.append(columnSQL);
             insertTableStringBuilder.append(") SELECT ");
             insertTableStringBuilder.append(columnSQL);
@@ -151,6 +135,27 @@ public class BaseMigration {
         if (mDatabase != null)
             mDatabase.execSQL(dropTableStringBuilder.toString());
         printLog("【删除临时表】" + tempTableName);
+    }
+
+    List<String> getColumns(String tableName) {
+        List<String> columns = new ArrayList<>();
+        String sql = "SELECT * FROM " + tableName + " limit 1";
+        Cursor cursor = null;
+        try {
+            if (mDatabase != null) cursor = mDatabase.rawQuery(sql, null);
+            else cursor = mEncryptedDatabase.rawQuery(sql, null);
+
+            if (cursor != null) {
+                columns = new ArrayList<>(Arrays.asList(cursor.getColumnNames()));
+            }
+        } catch (Exception e) {
+            Log.v(tableName, e.getMessage(), e);
+            e.printStackTrace();
+        } finally {
+            if (cursor != null)
+                cursor.close();
+        }
+        return columns;
     }
 
     private String[] getNewColumns(String tableName) {
@@ -178,9 +183,5 @@ public class BaseMigration {
             if (cursor != null) cursor.close();
         }
         return columnNames;
-    }
-
-    protected void printLog(String info) {
-        if (DEBUG) Log.d(TAG, info);
     }
 }

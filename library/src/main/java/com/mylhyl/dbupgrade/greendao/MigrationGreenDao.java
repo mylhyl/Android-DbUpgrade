@@ -69,7 +69,15 @@ final class MigrationGreenDao extends BaseMigration {
 
     private void dropAllTables(Database db, List<TableGreenDao> upgradeList) {
         for (TableGreenDao upgradeTable : upgradeList) {
-            reflectMethod(db, "dropTable", true, upgradeTable);
+            if (TextUtils.isEmpty(upgradeTable.sqlCreateTable)) {
+                reflectMethod(db, "dropTable", true, upgradeTable);
+            } else {
+                Class<? extends AbstractDao<?, ?>> abstractDao = upgradeTable.abstractDao;
+                DaoConfig daoConfig = new DaoConfig(db, abstractDao);
+                String tableName = daoConfig.tablename;
+                String sql = "DROP TABLE IF EXISTS " + tableName;
+                db.execSQL(sql);
+            }
         }
         printLog("【Drop all table】");
     }
@@ -81,6 +89,20 @@ final class MigrationGreenDao extends BaseMigration {
             else db.execSQL(upgradeTable.sqlCreateTable);
         }
         printLog("【Create all table】");
+    }
+
+    private void restoreData(Database db, List<TableGreenDao> upgradeList) {
+        for (TableGreenDao upgradeTable : upgradeList) {
+            Class<? extends AbstractDao<?, ?>> abstractDao = upgradeTable.abstractDao;
+            DaoConfig daoConfig = new DaoConfig(db, abstractDao);
+            String tableName = daoConfig.tablename;
+            String tempTableName = daoConfig.tablename.concat("_TEMP");
+
+            if (!tableIsExist(true, tempTableName)) {
+                continue;
+            }
+            restoreData(tableName, tempTableName);
+        }
     }
 
     /**
@@ -99,20 +121,6 @@ final class MigrationGreenDao extends BaseMigration {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
             e.printStackTrace();
-        }
-    }
-
-    private void restoreData(Database db, List<TableGreenDao> upgradeList) {
-        for (TableGreenDao upgradeTable : upgradeList) {
-            Class<? extends AbstractDao<?, ?>> abstractDao = upgradeTable.abstractDao;
-            DaoConfig daoConfig = new DaoConfig(db, abstractDao);
-            String tableName = daoConfig.tablename;
-            String tempTableName = daoConfig.tablename.concat("_TEMP");
-
-            if (!tableIsExist(true, tempTableName)) {
-                continue;
-            }
-            restoreData(tableName, tempTableName);
         }
     }
 }
