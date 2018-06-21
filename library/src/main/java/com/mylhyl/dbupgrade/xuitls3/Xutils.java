@@ -36,11 +36,22 @@ public final class Xutils {
         /**
          * 设置升级表
          *
-         * @param entityType
-         * @return
+         * @param entityType entityType
+         * @return ControllerXutils
          */
         public ControllerXutils setUpgradeTable(Class<?> entityType) {
-            mUpgradeController = new ControllerXutils(this, entityType);
+            return setUpgradeTable(entityType, "");
+        }
+
+        /**
+         * 设置升级表
+         *
+         * @param entityType     entityType
+         * @param sqlCreateTable sqlCreateTable
+         * @return ControllerXutils
+         */
+        public ControllerXutils setUpgradeTable(Class<?> entityType, String sqlCreateTable) {
+            mUpgradeController = new ControllerXutils(this, entityType, sqlCreateTable);
             return mUpgradeController;
         }
 

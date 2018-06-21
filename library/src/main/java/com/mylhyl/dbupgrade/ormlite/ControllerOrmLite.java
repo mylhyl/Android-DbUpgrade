@@ -10,22 +10,20 @@ import com.mylhyl.dbupgrade.base.AbsController;
 public final class ControllerOrmLite extends AbsController<TableOrmLite, Class<?>,
         OrmLite.With, ControllerOrmLite> {
 
-    ControllerOrmLite(OrmLite.With with, Class<?> entityType) {
+    ControllerOrmLite(OrmLite.With with, Class<?> entityType, String sqlCreateTable) {
         this.mWith = with;
-        this.mTable = new TableOrmLite(entityType);
+        this.mTable = new TableOrmLite(entityType, sqlCreateTable);
     }
 
 
     @Override
     public ControllerOrmLite setUpgradeTable(Class<?> entityType) {
-        addUpgrade();
-        return mWith.setUpgradeTable(entityType);
+        return setUpgradeTable(entityType, "");
     }
 
     @Override
-    public ControllerOrmLite setSqlCreateTable(String sqlCreateTable) {
-        mTable.sqlCreateTable = sqlCreateTable;
-        return this;
+    public ControllerOrmLite setUpgradeTable(Class<?> entityType, String sqlCreateTable) {
+        addUpgrade();
+        return mWith.setUpgradeTable(entityType);
     }
-
 }

@@ -8,7 +8,8 @@ import com.mylhyl.dbupgrade.base.BaseTable;
 final class TableXutils extends BaseTable {
     public Class<?> entityType;
 
-    public TableXutils(Class<?> entityType) {
+    public TableXutils(Class<?> entityType, String sqlCreateTable) {
         this.entityType = entityType;
+        this.sqlCreateTable = sqlCreateTable;
     }
 }

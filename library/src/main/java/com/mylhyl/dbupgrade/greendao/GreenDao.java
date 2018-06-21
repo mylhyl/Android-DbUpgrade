@@ -48,18 +48,6 @@ public final class GreenDao {
             mUpgradeVersion = upgradeVersion;
         }
 
-        /**
-         * 设置需要升级的 AbstractDao 类
-         *
-         * @param abstractDao
-         * @return
-         */
-        public ControllerGreenDao setUpgradeTable(Class<? extends AbstractDao<?, ?>>
-                                                          abstractDao) {
-            mUpgradeController = new ControllerGreenDao(this, abstractDao);
-            return mUpgradeController;
-        }
-
         @Override
         protected void addUpgrade(TableGreenDao upgrade) {
             mUpgradeList.add(upgrade);
@@ -77,6 +65,29 @@ public final class GreenDao {
             else
                 new MigrationGreenDao().migrate(mSqLiteDatabase, mOldVersion,
                         mUpgradeList);
+        }
+
+        /**
+         * 设置需要升级的 AbstractDao 类
+         *
+         * @param abstractDao abstractDao
+         * @return ControllerGreenDao
+         */
+        public ControllerGreenDao setUpgradeTable(Class<? extends AbstractDao<?, ?>> abstractDao) {
+            return setUpgradeTable(abstractDao, "");
+        }
+
+        /**
+         * 设置需要升级的 AbstractDao 类
+         *
+         * @param abstractDao    abstractDao
+         * @param sqlCreateTable sqlCreateTable
+         * @return ControllerGreenDao
+         */
+        public ControllerGreenDao setUpgradeTable(Class<? extends AbstractDao<?, ?>> abstractDao
+                , String sqlCreateTable) {
+            mUpgradeController = new ControllerGreenDao(this, abstractDao, sqlCreateTable);
+            return mUpgradeController;
         }
     }
 }

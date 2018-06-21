@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 数据库升级工具类
  * Created by hupei on 2017/6/9.
  */
 public final class Migration extends BaseMigration {

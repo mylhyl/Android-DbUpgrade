@@ -2,8 +2,8 @@ package com.mylhyl.dbupgrade.original;
 
 import android.text.TextUtils;
 
-import com.mylhyl.dbupgrade.base.AbsController;
 import com.mylhyl.dbupgrade.ColumnType;
+import com.mylhyl.dbupgrade.base.AbsController;
 
 import java.util.List;
 
@@ -13,9 +13,9 @@ import java.util.List;
 
 public final class Controller extends AbsController<Table, String, Original.With, Controller> {
 
-    public Controller(Original.With with, String tableName) {
+    public Controller(Original.With with, String tableName, String sqlCreateTable) {
         this.mWith = with;
-        this.mTable = new Table(tableName);
+        this.mTable = new Table(tableName, sqlCreateTable);
     }
 
     /**
@@ -47,14 +47,13 @@ public final class Controller extends AbsController<Table, String, Original.With
 
     @Override
     public Controller setUpgradeTable(String tableName) {
-        addUpgrade();
-        return mWith.setUpgradeTable(tableName);
+        return setUpgradeTable(tableName, "");
     }
 
     @Override
-    public Controller setSqlCreateTable(String sqlCreateTable) {
-        mTable.sqlCreateTable = sqlCreateTable;
-        return this;
+    public Controller setUpgradeTable(String tableName, String sqlCreateTable) {
+        addUpgrade();
+        return mWith.setUpgradeTable(tableName, sqlCreateTable);
     }
 
     @Override

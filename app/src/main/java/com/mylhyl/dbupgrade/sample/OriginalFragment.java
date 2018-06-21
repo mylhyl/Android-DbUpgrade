@@ -2,7 +2,6 @@ package com.mylhyl.dbupgrade.sample;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
@@ -10,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 
 import com.mylhyl.dbupgrade.ColumnType;
 import com.mylhyl.dbupgrade.DbUpgrade;
@@ -191,9 +189,9 @@ public class OriginalFragment extends Fragment {
                 Original with = dbUpgrade.with(db.getDatabase());
                 with.setUpgradeVersion(1)
                         .setUpgradeTable("School")
+//                        .setUpgradeTable("School", SchoolEntity.sqlCreate3.toString())
                         .addColumn("studentId", ColumnType.INTEGER)
                         .removeColumn("name")
-//                            .setSqlCreateTable(SchoolEntity.sqlCreate3.toString())
 
                         .setUpgradeTable("Student")
                         .addColumn("sex", ColumnType.TEXT)

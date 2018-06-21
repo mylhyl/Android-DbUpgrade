@@ -14,14 +14,14 @@ public class DeviceEntity {
 
     private String deviceNum = "deviceNum";
 
-    //版本2删除
-    private String bay = "bay";
+    //版本3添加
+    private String unit = "unit";
 
-    @Generated(hash = 2064758942)
-    public DeviceEntity(Long stationNum, String deviceNum, String bay) {
+    @Generated(hash = 1659403700)
+    public DeviceEntity(Long stationNum, String deviceNum, String unit) {
         this.stationNum = stationNum;
         this.deviceNum = deviceNum;
-        this.bay = bay;
+        this.unit = unit;
     }
 
     @Generated(hash = 1449836520)
@@ -44,15 +44,12 @@ public class DeviceEntity {
         this.deviceNum = deviceNum;
     }
 
-    public String getBay() {
-        return this.bay;
+    public String getUnit() {
+        return this.unit;
     }
 
-    public void setBay(String bay) {
-        this.bay = bay;
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
-
-    //版本3添加
-//    private String unit = "unit";
 
 }

@@ -12,22 +12,21 @@ import org.greenrobot.greendao.AbstractDao;
 public final class ControllerGreenDao extends AbsController<TableGreenDao,
         Class<? extends AbstractDao<?, ?>>, GreenDao.With, ControllerGreenDao> {
 
-    ControllerGreenDao(GreenDao.With with, Class<? extends AbstractDao<?, ?>>
-            abstractDao) {
+    ControllerGreenDao(GreenDao.With with, Class<? extends AbstractDao<?, ?>> abstractDao
+            , String sqlCreateTable) {
         this.mWith = with;
-        this.mTable = new TableGreenDao(abstractDao);
+        this.mTable = new TableGreenDao(abstractDao, sqlCreateTable);
     }
-
 
     @Override
     public ControllerGreenDao setUpgradeTable(Class<? extends AbstractDao<?, ?>> abstractDao) {
-        addUpgrade();
-        return mWith.setUpgradeTable(abstractDao);
+        return setUpgradeTable(abstractDao, "");
     }
 
     @Override
-    public ControllerGreenDao setSqlCreateTable(String sqlCreateTable) {
-        mTable.sqlCreateTable = sqlCreateTable;
-        return this;
+    public ControllerGreenDao setUpgradeTable(Class<? extends AbstractDao<?, ?>> abstractDao
+            , String sqlCreateTable) {
+        addUpgrade();
+        return mWith.setUpgradeTable(abstractDao, sqlCreateTable);
     }
 }

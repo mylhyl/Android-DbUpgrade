@@ -9,9 +9,9 @@ import org.greenrobot.greendao.AbstractDao;
  */
 final class TableGreenDao extends BaseTable {
     public Class<? extends AbstractDao<?, ?>> abstractDao;
-    public String sqlCreateTable;
 
-    public TableGreenDao(Class<? extends AbstractDao<?, ?>> abstractDao) {
+    public TableGreenDao(Class<? extends AbstractDao<?, ?>> abstractDao, String sqlCreateTable) {
         this.abstractDao = abstractDao;
+        this.sqlCreateTable = sqlCreateTable;
     }
 }

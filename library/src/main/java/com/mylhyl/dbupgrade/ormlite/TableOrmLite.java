@@ -8,7 +8,8 @@ import com.mylhyl.dbupgrade.base.BaseTable;
 final class TableOrmLite extends BaseTable {
     public Class<?> entityType;
 
-    public TableOrmLite(Class<?> entityType) {
+    public TableOrmLite(Class<?> entityType, String sqlCreateTable) {
         this.entityType = entityType;
+        this.sqlCreateTable = sqlCreateTable;
     }
 }

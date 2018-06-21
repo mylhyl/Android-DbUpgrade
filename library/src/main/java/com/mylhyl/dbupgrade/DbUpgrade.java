@@ -12,6 +12,10 @@ import org.greenrobot.greendao.database.Database;
 import org.xutils.DbManager;
 
 /**
+ * 1、创建临时表
+ * 2、删除旧表
+ * 3、创建新表
+ * 4、还原数据
  * Created by hupei on 2017/6/9.
  */
 
@@ -26,8 +30,8 @@ public final class DbUpgrade {
     /**
      * 原生
      *
-     * @param db
-     * @return
+     * @param db db
+     * @return Original
      */
     public Original with(SQLiteDatabase db) {
         return new Original(mOldVersion, mNewVersion, db);
@@ -36,8 +40,8 @@ public final class DbUpgrade {
     /**
      * xutils3 框架
      *
-     * @param db
-     * @return
+     * @param db db
+     * @return Xutils
      */
     public Xutils withXutils(DbManager db) {
         return new Xutils(mOldVersion, mNewVersion, db);
@@ -46,8 +50,8 @@ public final class DbUpgrade {
     /**
      * greenDao 框架
      *
-     * @param db
-     * @return
+     * @param db db
+     * @return GreenDao
      */
     public GreenDao withGreenDao(Database db) {
         return new GreenDao(mOldVersion, mNewVersion, db);
@@ -56,8 +60,8 @@ public final class DbUpgrade {
     /**
      * greenDao 框架
      *
-     * @param db
-     * @return
+     * @param db db
+     * @return GreenDao
      */
     public GreenDao withGreenDao(SQLiteDatabase db) {
         return new GreenDao(mOldVersion, mNewVersion, db);
@@ -66,9 +70,9 @@ public final class DbUpgrade {
     /**
      * OrmLite 框架
      *
-     * @param db
-     * @param connectionSource
-     * @return
+     * @param db               db
+     * @param connectionSource connectionSource
+     * @return OrmLite
      */
     public OrmLite withOrmLite(SQLiteDatabase db, ConnectionSource connectionSource) {
         return new OrmLite(mOldVersion, mNewVersion, db, connectionSource);

@@ -40,11 +40,22 @@ public final class OrmLite {
         /**
          * 设置升级表
          *
-         * @param entityType
-         * @return
+         * @param entityType entityType
+         * @return ControllerOrmLite
          */
         public ControllerOrmLite setUpgradeTable(Class<?> entityType) {
-            mUpgradeController = new ControllerOrmLite(this, entityType);
+            return setUpgradeTable(entityType, "");
+        }
+
+        /**
+         * 设置升级表
+         *
+         * @param entityType     entityType
+         * @param sqlCreateTable sqlCreateTable
+         * @return ControllerOrmLite
+         */
+        public ControllerOrmLite setUpgradeTable(Class<?> entityType, String sqlCreateTable) {
+            mUpgradeController = new ControllerOrmLite(this, entityType, sqlCreateTable);
             return mUpgradeController;
         }
 

@@ -38,26 +38,6 @@ public final class Original {
             mUpgradeVersion = upgradeVersion;
         }
 
-        /**
-         * 设置需要升级的表名
-         *
-         * @param tableName
-         * @return
-         */
-        public Controller setUpgradeTable(String tableName) {
-            mUpgradeController = new Controller(this, tableName);
-            return mUpgradeController;
-        }
-
-        @Override
-        protected void upgrade() {
-            new Migration().migrate(mSQLiteDatabase, mOldVersion, mUpgradeList);
-        }
-
-        protected SQLiteDatabase getSQLiteDatabase() {
-            return mSQLiteDatabase;
-        }
-
         @Override
         protected void addUpgrade(Table upgradeTable) {
             mUpgradeList.add(upgradeTable);
@@ -66,6 +46,37 @@ public final class Original {
         @Override
         protected void clearUpgradeList() {
             mUpgradeList.clear();
+        }
+
+        @Override
+        protected void upgrade() {
+            new Migration().migrate(mSQLiteDatabase, mOldVersion, mUpgradeList);
+        }
+
+        /**
+         * 设置需要升级的表名
+         *
+         * @param tableName 表名
+         * @return Controller
+         */
+        public Controller setUpgradeTable(String tableName) {
+            return setUpgradeTable(tableName, "");
+        }
+
+        /**
+         * 设置需要升级的表名
+         *
+         * @param tableName      表名
+         * @param sqlCreateTable 创建表的 sql
+         * @return Controller
+         */
+        public Controller setUpgradeTable(String tableName, String sqlCreateTable) {
+            mUpgradeController = new Controller(this, tableName, sqlCreateTable);
+            return mUpgradeController;
+        }
+
+        protected SQLiteDatabase getSQLiteDatabase() {
+            return mSQLiteDatabase;
         }
     }
 }

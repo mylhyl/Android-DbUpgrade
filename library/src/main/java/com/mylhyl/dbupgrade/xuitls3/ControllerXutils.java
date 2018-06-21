@@ -10,22 +10,21 @@ import com.mylhyl.dbupgrade.base.AbsController;
 public final class ControllerXutils extends AbsController<TableXutils, Class<?>,
         Xutils.With, ControllerXutils> {
 
-    ControllerXutils(Xutils.With with, Class<?> entityType) {
+    ControllerXutils(Xutils.With with, Class<?> entityType, String sqlCreateTable) {
         this.mWith = with;
-        this.mTable = new TableXutils(entityType);
+        this.mTable = new TableXutils(entityType, sqlCreateTable);
     }
 
 
     @Override
     public ControllerXutils setUpgradeTable(Class<?> entityType) {
-        addUpgrade();
-        return mWith.setUpgradeTable(entityType);
+        return setUpgradeTable(entityType, "");
     }
 
     @Override
-    public ControllerXutils setSqlCreateTable(String sqlCreateTable) {
-        mTable.sqlCreateTable = sqlCreateTable;
-        return this;
+    public ControllerXutils setUpgradeTable(Class<?> entityType, String sqlCreateTable) {
+        addUpgrade();
+        return mWith.setUpgradeTable(entityType, sqlCreateTable);
     }
 
 }

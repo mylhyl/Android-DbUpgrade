@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.mylhyl.dbupgrade.BuildConfig;
+import com.mylhyl.dbupgrade.ColumnType;
 
 import org.greenrobot.greendao.database.EncryptedDatabase;
 
@@ -147,7 +148,7 @@ public class BaseMigration {
                 Iterator<Map.Entry<String, String>> it = propertiesNotNull.entrySet().iterator();
                 while (it.hasNext()) {
                     Map.Entry<String, String> entry = it.next();
-                    if (entry.getValue().equalsIgnoreCase("TEXT")) {
+                    if (entry.getValue().equalsIgnoreCase(ColumnType.TEXT.name())) {
                         insertTableStringBuilder.append(",'").append("'");
                     } else {
                         insertTableStringBuilder.append(",").append(0);

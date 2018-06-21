@@ -13,11 +13,6 @@ import org.xutils.ex.DbException;
 import java.util.List;
 
 /**
- * xutils3数据库升级工具
- * 1、创建临时表
- * 2、删除旧表
- * 3、创建新表
- * 4、还原数据
  * Created by hupei on 2017/6/14.
  */
 final class MigrationXutils extends BaseMigration {
@@ -88,6 +83,20 @@ final class MigrationXutils extends BaseMigration {
         }
     }
 
+    private void restoreData(DbManager db, List<TableXutils> upgradeList)
+            throws DbException {
+        for (TableXutils upgrade : upgradeList) {
+            TableEntity table = db.getTable(upgrade.entityType);
+            String tableName = table.getName();
+            String tempTableName = tableName.concat("_TEMP");
+            if (!tableIsExist(true, tempTableName)) {
+                printLog("【临时表不存在】" + tempTableName);
+                continue;
+            }
+            restoreData(tableName, tempTableName);
+        }
+    }
+
     private void createTable(DbManager db, TableEntity tableEntity) throws
             DbException {
         if (!tableEntity.tableIsExist()) {
@@ -108,20 +117,6 @@ final class MigrationXutils extends BaseMigration {
                     printLog("【创建多主键新表成功】\n" + sql);
                 }
             }
-        }
-    }
-
-    private void restoreData(DbManager db, List<TableXutils> upgradeList)
-            throws DbException {
-        for (TableXutils upgrade : upgradeList) {
-            TableEntity table = db.getTable(upgrade.entityType);
-            String tableName = table.getName();
-            String tempTableName = tableName.concat("_TEMP");
-            if (!tableIsExist(true, tempTableName)) {
-                printLog("【临时表不存在】" + tempTableName);
-                continue;
-            }
-            restoreData(tableName, tempTableName);
         }
     }
 }

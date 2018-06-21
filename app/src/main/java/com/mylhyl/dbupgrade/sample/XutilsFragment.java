@@ -184,7 +184,6 @@ public class XutilsFragment extends Fragment {
                 Xutils with = dbUpgrade.withXutils(db);
                 with.setUpgradeVersion(1)
                         .setUpgradeTable(ParentEntity2.class)
-                        .setSqlCreateTable("")
                         .setUpgradeTable(ChildEntity2.class)
                         //每个版本都必须 upgrade()一次
                         .upgrade();
