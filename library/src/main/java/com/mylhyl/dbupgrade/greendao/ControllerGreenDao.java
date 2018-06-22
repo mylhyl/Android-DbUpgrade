@@ -1,7 +1,6 @@
 package com.mylhyl.dbupgrade.greendao;
 
 
-import com.mylhyl.dbupgrade.ColumnType;
 import com.mylhyl.dbupgrade.base.AbsController;
 
 import org.greenrobot.greendao.AbstractDao;
@@ -17,18 +16,6 @@ public final class ControllerGreenDao extends AbsController<TableGreenDao,
             , String sqlCreateTable) {
         this.mWith = with;
         this.mTable = new TableGreenDao(abstractDao, sqlCreateTable);
-    }
-
-    @Override
-    public ControllerGreenDao setMigration(boolean migration) {
-        this.mTable.migration = migration;
-        return this;
-    }
-
-    @Override
-    public ControllerGreenDao addColumn(String columnName, ColumnType fieldType) {
-        mTable.addColumn(columnName, fieldType);
-        return this;
     }
 
     @Override

@@ -2,7 +2,6 @@ package com.mylhyl.dbupgrade.original;
 
 import android.text.TextUtils;
 
-import com.mylhyl.dbupgrade.ColumnType;
 import com.mylhyl.dbupgrade.base.AbsController;
 
 import java.util.List;
@@ -17,18 +16,6 @@ public final class ControllerOriginal extends AbsController<TableOriginal, Strin
     public ControllerOriginal(Original.With with, String tableName, String sqlCreateTable) {
         this.mWith = with;
         this.mTable = new TableOriginal(tableName, sqlCreateTable);
-    }
-
-    @Override
-    public ControllerOriginal setMigration(boolean migration) {
-        this.mTable.migration = migration;
-        return this;
-    }
-
-    @Override
-    public ControllerOriginal addColumn(String columnName, ColumnType fieldType) {
-        mTable.addColumn(columnName, fieldType);
-        return this;
     }
 
     @Override
@@ -78,6 +65,7 @@ public final class ControllerOriginal extends AbsController<TableOriginal, Strin
 
     /**
      * 删除列
+     * 当调用此方法时 内部会 setMigration(true)
      *
      * @param columnName 列名
      * @return

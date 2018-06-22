@@ -43,3 +43,55 @@
                     //每个版本都必须 upgrade()一次
                     .upgrade();
 ```
+
+#### 使用方法
+```java
+
+        DbUpgrade dbUpgrade = new DbUpgrade(oldVersion, newVersion);//oldVersion旧版本 newVersion新版本
+        GreenDao greenDao = dbUpgrade.withGreenDao(db);//Greendao框架
+        greenDao.setUpgradeVersion(1)//在此版本上升级
+                //注意调用setUpgradeTable一次，是对另一个表的设置，再次调用setUpgradeTable之前所调用方法只会对此表生效
+                /*
+                    例如
+                    字段1是表A的
+                    字段2是表B的
+
+                    setUpgradeTable(表A)
+                    .addColumn(字段1)
+                    setUpgradeTable(表B)
+                    .addColumn(字段2)
+                 */
+                .setUpgradeTable(abstractDao)//数据库实体类的DAO
+                .setUpgradeTable(abstractDao, sqlCreateTable)//abstractDao 数据实体的DAO；sqlCreateTable创建数据库的sql
+                .addColumn(columnName, fieldType)//表添加字段 columnName为表列名，fieldType为数据类型 ColumnType枚举
+                .upgrade();//每setUpgradeVersion一个版号必须要调用此方法；默认true；是否走升级策略(1建临时，2删旧表，3建新表，4还原数据)
+        //true走升级策略(1建临时，2删旧表，3建新表，4还原数据)
+        //如果表只有添加字段，建议设 false 提高升级的效率，但 addColumn 为空也会走升级策略
+        //如果表既有添加也有删除字段，那么是否走升级策略，开发者自己定夺
+        //.upgrade(migration);
+        greenDao.setUpgradeVersion(2)//在此版本上升级
+                .setUpgradeTable()
+                .upgrade();
+
+        Xutils xutils = dbUpgrade.withXutils(db);//Xutils3框架
+        xutils.setUpgradeVersion(1)//在此版本上升级
+                .setUpgradeTable(entityType)//数据库实体类
+                .setUpgradeTable(entityType, sqlCreateTable)//entityType 数据库实体类；sqlCreateTable创建数据库的sql
+                .addColumn(columnName, fieldType)//表添加字段 columnName为表列名，fieldType为数据类型 ColumnType枚举
+                .upgrade();//每setUpgradeVersion一个版号必须要调用此方法
+
+        OrmLite ormLite = dbUpgrade.withOrmLite(db, connectionSource);//OrmLite框架
+        ormLite.setUpgradeVersion(1)//在此版本上升级
+                .setUpgradeTable(entityType)//数据库实体类
+                .setUpgradeTable(entityType, sqlCreateTable)//entityType 数据库实体类；sqlCreateTable创建数据库的sql
+                .addColumn(columnName, fieldType)//表添加字段 columnName为表列名，fieldType为数据类型 ColumnType枚举；当调用此方法时 内部会 setMigration(false)
+                .upgrade();//每setUpgradeVersion一个版号必须要调用此方法
+
+        Original original = dbUpgrade.with(db);//原生的
+        original.setUpgradeVersion(1)//在此版本上升级
+                .setUpgradeTable(tableName)//表名
+                .setUpgradeTable(tableName, sqlCreateTable)//tableName表名；sqlCreateTable创建数据库的sql
+                .removeColumn(columnName)//表删除的列名；当调用此方法时内部会 setMigration(true)
+                .addColumn(columnName, fieldType)//表添加字段 columnName为表列名，fieldType为数据类型 ColumnType枚举；当调用此方法时 内部会 setMigration(false)
+                .upgrade();//每setUpgradeVersion一个版号必须要调用此方法
+```

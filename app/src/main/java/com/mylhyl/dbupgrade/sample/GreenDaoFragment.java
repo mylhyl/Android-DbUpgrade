@@ -139,7 +139,7 @@ public class GreenDaoFragment extends Fragment {
     private void on1Update2() {
         DaoMaster greenDao = getGreenDao();
         if (greenDao.SCHEMA_VERSION == 2) {
-            greenDao.getDatabase().close();
+            greenDao.getDatabase().getRawDatabase();
             onFindColumn();
         } else {
             Toast.makeText(mainActivity, "app.gradle schemaVersion 必须 2", Toast
@@ -150,7 +150,7 @@ public class GreenDaoFragment extends Fragment {
     private void on2Update3() {
         DaoMaster greenDao = getGreenDao();
         if (greenDao.SCHEMA_VERSION == 3) {
-            greenDao.getDatabase().close();
+            greenDao.getDatabase().getRawDatabase();
             onFindColumn();
         } else
             Toast.makeText(mainActivity, "app.gradle schemaVersion 必须 3", Toast
@@ -160,7 +160,7 @@ public class GreenDaoFragment extends Fragment {
     private void on1Update3() {
         DaoMaster greenDao = getGreenDao();
         if (greenDao.SCHEMA_VERSION == 3) {
-            greenDao.getDatabase().close();
+            greenDao.getDatabase().getRawDatabase();
             onFindColumn();
         } else
             Toast.makeText(mainActivity, "app.gradle schemaVersion 必须 3", Toast
@@ -195,15 +195,15 @@ public class GreenDaoFragment extends Fragment {
             GreenDao greenDao = dbUpgrade.withGreenDao(db);
             greenDao.setUpgradeVersion(1)
                     .setUpgradeTable(DeviceEntityDao.class)
-                    .setMigration(false)
-                    .setUpgradeTable(UserEntityDao.class)
 //                    .addColumn(DeviceEntityDao.Properties.Content.columnName, ColumnType.TEXT)
 //                    .addColumn(DeviceEntityDao.Properties.Info.columnName, ColumnType.INTEGER)
+                    .setUpgradeTable(UserEntityDao.class)
                     //每个版本都必须 upgrade()一次
                     .upgrade();
 
             greenDao.setUpgradeVersion(2)
                     .setUpgradeTable(DeviceEntityDao.class)
+//                    .addColumn(DeviceEntityDao.Properties.ComOrl.columnName, ColumnType.INTEGER)
                     .setUpgradeTable(UserEntityDao.class)
                     //每个版本都必须 upgrade()一次
                     .upgrade();

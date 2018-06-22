@@ -6,28 +6,10 @@ import com.mylhyl.dbupgrade.ColumnType;
  * Created by hupei on 2017/6/16.
  */
 
-public abstract class AbsController<Table extends BaseTable, Name, With extends AbsWith, Controller> {
+public abstract class AbsController<Table extends BaseTable, Name, With extends AbsWith
+        , Controller extends AbsController> {
     protected With mWith;
     protected Table mTable;
-
-    /**
-     * 是否走升级策略(1建临时，2删旧表，3建新表，4还原数据)
-     * 建议表只有添加字段设置 false，但 addColumn 为空也会走升级策略
-     *
-     * @param migration true 是 false 否
-     * @return Controller
-     */
-    public abstract Controller setMigration(boolean migration);
-
-    /**
-     * 添加列
-     * 当调用此方法时 内部会 setMigration(false)
-     *
-     * @param columnName 列名
-     * @param fieldType  列类型
-     * @return Controller
-     */
-    public abstract Controller addColumn(String columnName, ColumnType fieldType);
 
     /**
      * 表配置结束，并配置另一个表
@@ -47,11 +29,24 @@ public abstract class AbsController<Table extends BaseTable, Name, With extends 
     public abstract Controller setUpgradeTable(Name name, String sqlCreateTable);
 
     /**
-     * 升级
+     * 升级，建议有删除表字段使用
+     * 策略(1建临时，2删旧表，3建新表，4还原数据)
      */
     public final void upgrade() {
+        upgrade(true);
+    }
+
+    /**
+     * 升级
+     * migration 为 true 走升级策略(1建临时，2删旧表，3建新表，4还原数据)
+     * 建议表只有添加字段设置 false 提高效率，但 addColumn 为空也会走升级策略
+     *
+     * @param migration 升级策略
+     */
+    public final void upgrade(boolean migration) {
         if (mWith.isUpgrade()) {
             addUpgrade();
+            mTable.migration = migration;
             mWith.upgrade();
             mWith.addOldVersion();
         }
@@ -61,5 +56,17 @@ public abstract class AbsController<Table extends BaseTable, Name, With extends 
     protected void addUpgrade() {
         if (mWith.isUpgrade())
             mWith.addUpgrade(mTable);
+    }
+
+    /**
+     * 添加列
+     *
+     * @param columnName 列名
+     * @param fieldType  列类型
+     * @return Controller
+     */
+    public final Controller addColumn(String columnName, ColumnType fieldType) {
+        mTable.addColumn(columnName, fieldType);
+        return (Controller) this;
     }
 }

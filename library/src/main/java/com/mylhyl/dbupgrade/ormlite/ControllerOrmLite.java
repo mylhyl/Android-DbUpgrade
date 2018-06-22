@@ -1,7 +1,6 @@
 package com.mylhyl.dbupgrade.ormlite;
 
 
-import com.mylhyl.dbupgrade.ColumnType;
 import com.mylhyl.dbupgrade.base.AbsController;
 
 /**
@@ -14,19 +13,6 @@ public final class ControllerOrmLite extends AbsController<TableOrmLite, Class<?
     ControllerOrmLite(OrmLite.With with, Class<?> entityType, String sqlCreateTable) {
         this.mWith = with;
         this.mTable = new TableOrmLite(entityType, sqlCreateTable);
-    }
-
-
-    @Override
-    public ControllerOrmLite setMigration(boolean migration) {
-        this.mTable.migration = migration;
-        return this;
-    }
-
-    @Override
-    public ControllerOrmLite addColumn(String columnName, ColumnType fieldType) {
-        mTable.addColumn(columnName, fieldType);
-        return this;
     }
 
     @Override

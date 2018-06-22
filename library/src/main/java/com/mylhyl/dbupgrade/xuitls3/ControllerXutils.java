@@ -1,7 +1,6 @@
 package com.mylhyl.dbupgrade.xuitls3;
 
 
-import com.mylhyl.dbupgrade.ColumnType;
 import com.mylhyl.dbupgrade.base.AbsController;
 
 /**
@@ -14,19 +13,6 @@ public final class ControllerXutils extends AbsController<TableXutils, Class<?>,
     ControllerXutils(Xutils.With with, Class<?> entityType, String sqlCreateTable) {
         this.mWith = with;
         this.mTable = new TableXutils(entityType, sqlCreateTable);
-    }
-
-
-    @Override
-    public ControllerXutils setMigration(boolean migration) {
-        this.mTable.migration = migration;
-        return this;
-    }
-
-    @Override
-    public ControllerXutils addColumn(String columnName, ColumnType fieldType) {
-        mTable.addColumn(columnName, fieldType);
-        return this;
     }
 
     @Override
