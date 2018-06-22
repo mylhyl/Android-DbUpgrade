@@ -9,7 +9,7 @@
 
 #### 使用Gradle构建时
 ```javascript
-    compile 'com.mylhyl:DbUpgrade:1.0.0'
+    compile 'com.mylhyl:DbUpgrade:1.1.0'
 ```
     
 #### 常用升级逻辑做法
@@ -84,14 +84,14 @@
         ormLite.setUpgradeVersion(1)//在此版本上升级
                 .setUpgradeTable(entityType)//数据库实体类
                 .setUpgradeTable(entityType, sqlCreateTable)//entityType 数据库实体类；sqlCreateTable创建数据库的sql
-                .addColumn(columnName, fieldType)//表添加字段 columnName为表列名，fieldType为数据类型 ColumnType枚举；当调用此方法时 内部会 setMigration(false)
+                .addColumn(columnName, fieldType)//表添加字段 columnName为表列名，fieldType为数据类型 ColumnType枚举
                 .upgrade();//每setUpgradeVersion一个版号必须要调用此方法
 
         Original original = dbUpgrade.with(db);//原生的
         original.setUpgradeVersion(1)//在此版本上升级
                 .setUpgradeTable(tableName)//表名
                 .setUpgradeTable(tableName, sqlCreateTable)//tableName表名；sqlCreateTable创建数据库的sql
-                .removeColumn(columnName)//表删除的列名；当调用此方法时内部会 setMigration(true)
-                .addColumn(columnName, fieldType)//表添加字段 columnName为表列名，fieldType为数据类型 ColumnType枚举；当调用此方法时 内部会 setMigration(false)
+                .removeColumn(columnName)//表删除的列名
+                .addColumn(columnName, fieldType)//表添加字段 columnName为表列名，fieldType为数据类型 ColumnType枚举
                 .upgrade();//每setUpgradeVersion一个版号必须要调用此方法
 ```

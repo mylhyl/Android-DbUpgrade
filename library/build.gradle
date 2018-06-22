@@ -10,7 +10,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 25
         versionCode 1
-        versionName "2018.6.21"
+        versionName "2018.6.22"
 
     }
     buildTypes {
@@ -36,7 +36,7 @@ publish {
     userOrg = 'mylhyl'
     groupId = 'com.mylhyl'
     artifactId = 'DbUpgrade'
-    version = '1.0.1'
+    version = '1.1.0'
     description = 'android sqlite table upgrade update and data migrate'
     website = "https://github.com/mylhyl/Android-DbUpgrade"
 }
